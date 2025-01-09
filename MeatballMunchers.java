@@ -1,7 +1,7 @@
 /* 
 Program Name: MeatballMunchers.java
-Names: Kyle Saric
-Date: 12/18/2024
+Names: Kyle Saric & Ben Brake
+Date: 1/7/2024
 Purpose: Create an intuitive and polished game for users to eat as many meatballs as possible and have fun
  */
 
