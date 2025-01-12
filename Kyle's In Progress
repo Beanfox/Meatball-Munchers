@@ -178,12 +178,17 @@ class Meatball {
 class GamePlayState extends GameState {
 
     // Character attributes
+    private final int sinkSpeed = 25;
+    private int raftChange = 0;
+    private int raftChangeCounter = 0;
     private int spriteX = 350;
+    private int spriteY = 455;
     private final int spriteWidth = 50;
     private final int spriteHeight = 50;
-    private final int moveSpeed = 10;
+    private int moveSpeed = 10;
     private String openMessage = "";
     private int counter = 0;
+    
     private static int hasEaten, hasBarfed;
 
     // Direction values
@@ -220,19 +225,88 @@ class GamePlayState extends GameState {
 
     @Override
     public void draw(Graphics g, GamePanel panel) {
-        // Draw the character
-        int spriteY = 572 - spriteHeight;
+
+        // Water
         g.setColor(Color.BLUE);
+        g.fillRect(0, 550, 800, 50);
+        g.setColor(new Color(101, 67, 33));
+
+        // Barrel rims
+        g.fillOval(22, 507+raftChange, 81, 81); 
+        g.fillOval(107, 507+raftChange, 81, 81); 
+        g.fillOval(191, 507+raftChange, 81, 81); 
+        g.fillOval(275, 507+raftChange, 81, 81); 
+        g.fillOval(359, 507+raftChange, 81, 81); 
+        g.fillOval(443, 507+raftChange, 81, 81); 
+        g.fillOval(527, 507+raftChange, 81, 81); 
+        g.fillOval(611, 507+raftChange, 81, 81); 
+        g.fillOval(697, 507+raftChange, 81, 81); 
+        g.fillRect(25, 510+raftChange, 750, 10);
+        
+        // Barrels
+        g.setColor(new Color(39, 97, 41)); // Dark, barrel green
+        g.fillOval(25, 510+raftChange, 75, 75); 
+        g.fillOval(110, 510+raftChange, 75, 75); 
+        g.fillOval(194, 510+raftChange, 75, 75); 
+        g.fillOval(278, 510+raftChange, 75, 75); 
+        g.fillOval(362, 510+raftChange, 75, 75); 
+        g.fillOval(446, 510+raftChange, 75, 75); 
+        g.fillOval(530, 510+raftChange, 75, 75); 
+        g.fillOval(614, 510+raftChange, 75, 75); 
+        g.fillOval(700, 510+raftChange, 75, 75); 
+
+        // Barrel caps
+        g.setColor(new Color(153, 0, 0));
+        g.fillOval(57, 520+raftChange, 10, 10);
+        g.fillOval(142, 520+raftChange, 10, 10);
+        g.fillOval(226, 520+raftChange, 10, 10);
+        g.fillOval(311, 520+raftChange, 10, 10);
+        g.fillOval(394, 520+raftChange, 10, 10);
+        g.fillOval(479, 520+raftChange, 10, 10);
+        g.fillOval(563, 520+raftChange, 10, 10);
+        g.fillOval(647, 520+raftChange, 10, 10);
+        g.fillOval(733, 520+raftChange, 10, 10);
+        g.setColor(new Color(15, 39, 16));
+        g.fillOval(55, 555+raftChange, 15, 15);
+        g.fillOval(140, 555+raftChange, 15, 15);
+        g.fillOval(224, 555+raftChange, 15, 15);
+        g.fillOval(309, 555+raftChange, 15, 15);
+        g.fillOval(392, 555+raftChange, 15, 15);
+        g.fillOval(477, 555+raftChange, 15, 15);
+        g.fillOval(561, 555+raftChange, 15, 15);
+        g.fillOval(645, 555+raftChange, 15, 15);
+        g.fillOval(731, 555+raftChange, 15, 15);
+
+        // Draw the character
+        spriteY = Math.min(455+raftChange, 520);
+        g.setColor(Color.BLACK); 
+        g.fillOval(spriteX-2, spriteY-2, spriteWidth+4, spriteHeight+4); // Body
+        g.setColor(Color.BLUE); 
         g.fillOval(spriteX, spriteY, spriteWidth, spriteHeight); // Body
         g.setColor(Color.YELLOW);
         g.fillOval(spriteX-3, spriteY-35, spriteWidth+10, spriteHeight+10); // Head
         g.fillOval(spriteX+45, spriteY+15, 15, 15); // Hand
-        g.fillOval(spriteX+15, 564, 25, 15); // Foot
+        g.fillOval(spriteX+15, spriteY+43, 25, 15); // Foot
         g.setColor(Color.BLACK); 
         g.fillOval(spriteX+5, spriteY-20, 5, 5); // Eye
         g.fillOval(spriteX+12, spriteY-30, 30, 10); // Mouth
         g.setColor(Color.RED);
         g.fillOval(spriteX+35, spriteY-29, 5, 8); // Tongue
+
+        // Sink the raft
+        raftChangeCounter++;
+        if (raftChangeCounter > sinkSpeed) {
+            raftChange++;
+            raftChangeCounter = 0;
+        }
+
+        // Slow the character if in the water
+        if (spriteY > 500) {
+            moveSpeed = 5;
+        }
+        if (spriteY > 510) {
+            moveSpeed = 2;
+        }
 
         // If the character has eaten within the last 10 frames, display an eating message
         if (hasEaten>0) {
@@ -309,9 +383,9 @@ class GamePlayState extends GameState {
 
         // Moves character left and right at their speed, within the bounds of the panel
         if (moveLeft == true) 
-            spriteX = Math.max(spriteX - moveSpeed, 0);
+            spriteX = Math.max(spriteX - moveSpeed, 25);
         if (moveRight == true) 
-            spriteX = Math.min(spriteX + moveSpeed, 800 - spriteWidth);
+            spriteX = Math.min(spriteX + moveSpeed, 775 - spriteWidth);
 
         // Randomly generate a meatball (1/25 chance every frame, 1 frame every 16 ms, avg 2.5 meatballs ever second)
         if (random.nextInt(25) == 0) { 
@@ -344,7 +418,7 @@ class GamePlayState extends GameState {
                 iterator.remove();
 
             // Removes meatballs the character has caught and adds to the counter (based on size of meatball)
-            else if (meatball.getBounds().intersects(new Rectangle(spriteX, panel.getHeight() - (15+spriteHeight) - 10, (5+spriteWidth), (15+spriteHeight)))) {
+            else if (meatball.getBounds().intersects(new Rectangle(spriteX, spriteY , (5+spriteWidth), (spriteHeight)))) {
                 iterator.remove();
                 score += meatball.isPoison()*Math.round(meatball.getDiam()/5);
                 if (score<0)
@@ -487,4 +561,3 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
         repaint();
     }
 }
-
