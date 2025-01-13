@@ -67,6 +67,14 @@ class MainMenuState extends GameState {
         g.setFont(new Font("Arial", Font.PLAIN, 24));
         g.drawRect(350, 285, 100, 50);
         g.drawString("Start", 370, 320);
+
+        g.setFont(new Font("Arial", Font.PLAIN, 24));
+        g.drawRect(325, 355, 150, 50);
+        g.drawString("How to Play", 335, 390);
+
+        g.setFont(new Font("Arial", Font.PLAIN, 24));
+        g.drawRect(350, 425, 100, 50);
+        g.drawString("Quit", 370, 460);
     }
 
     @Override
@@ -75,13 +83,90 @@ class MainMenuState extends GameState {
         int mouseX = e.getX();
         int mouseY = e.getY();
 
-        int buttonX = 350;
-        int buttonY = 285;
+        int startButtonX = 350;
+        int startButtonY = 285;
+        int howToPlayButtonX = 350;
+        int howToPlayButtonY = 355;
+        int howToPlayButtonWidth = 150;
+        int quitButtonX = 350;
+        int quitButtonY = 425;
+
         int buttonWidth = 100;
         int buttonHeight = 50;
 
-        if (mouseX >= buttonX && mouseX <= buttonX+buttonWidth && mouseY >= buttonY && mouseY <= buttonY+buttonHeight) {
+        if (mouseX >= startButtonX && mouseX <= startButtonX + buttonWidth && mouseY >= startButtonY && mouseY <= startButtonY + buttonHeight) {
             panel.setGameState(new GamePlayState());
+        }
+        if (mouseX >= howToPlayButtonX && mouseX <= howToPlayButtonX + howToPlayButtonWidth && mouseY >= howToPlayButtonY && mouseY <= howToPlayButtonY + buttonHeight) {
+            panel.setGameState(new HowToPlayState());
+        }
+        if (mouseX >= quitButtonX && mouseX <= quitButtonX + buttonWidth && mouseY >= quitButtonY && mouseY <= quitButtonY + buttonHeight) {
+            System.exit(0);
+        }
+    }
+    // Unused
+    @Override
+    public void handleKeyPress(int keyCode, GamePanel panel) {}
+}
+
+class HowToPlayState extends GameState{
+    @Override
+    public void draw(Graphics g, GamePanel panel) {
+        g.setColor(Color.BLACK);
+        g.setFont(new Font("Arial", Font.BOLD, 24));
+        g.drawString("Normal Meatball", 50, 50);
+        g.setFont(new Font("Arial", Font.PLAIN, 24));
+        g.drawString("collect to gain points", 35, 100);
+
+        g.setFont(new Font("Arial", Font.BOLD, 24));
+        g.drawString("Rotten Meatball", 545, 50);
+        g.setFont(new Font("Arial", Font.PLAIN, 24));
+        g.drawString("collect to lose points", 525, 100);
+
+        g.setColor(Color.BLACK);
+        g.setFont(new Font("Arial", Font.BOLD, 24));
+        g.drawString("Spiked Meatball", 50, 400);
+        g.setFont(new Font("Arial", Font.PLAIN, 24));
+        g.drawString("kills player", 80, 450);
+
+        g.setFont(new Font("Arial", Font.BOLD, 24));
+        g.drawString("Speed Meatball", 540, 400);
+        g.setFont(new Font("Arial", Font.PLAIN, 24));
+        g.drawString("movement speed up", 520, 450);
+
+        g.setFont(new Font("Arial", Font.PLAIN, 24));
+        g.drawRect(330, 250, 100, 50);
+        g.drawString("Menu", 350, 285);
+
+        g.setColor(new Color(51, 204, 0)); // Green
+        g.fillOval(600, 135, 75, 75);
+        g.setColor(new Color(0, 102, 0)); // Dark green
+        g.fillOval(600 + 75 / 4, 135 + 75 / 4, 75 / 2, 75 / 2);
+
+        g.setColor(new Color(204, 51, 0)); // Red
+        g.fillOval(95, 135, 75, 75);
+        g.setColor(new Color(153, 0, 0)); // Dark red
+        g.fillOval(95 + 75 / 4, 135 + 75 / 4, 75 / 2, 75 / 2);
+
+        /*
+         * ADD THE OTHER TWO MEATBALLS/OBJECTS
+         */
+    }
+
+    @Override
+    // Start the game if the user clicks the start button
+    public void handleClick(MouseEvent e, GamePanel panel) {
+        int mouseX = e.getX();
+        int mouseY = e.getY();
+
+        int backToMenuButtonX = 350;
+        int backToMenuButtonY = 250;
+
+        int buttonWidth = 100;
+        int buttonHeight = 50;
+
+        if (mouseX >= backToMenuButtonX && mouseX <= backToMenuButtonX + buttonWidth && mouseY >= backToMenuButtonY && mouseY <= backToMenuButtonY + buttonHeight) {
+            panel.setGameState(new MainMenuState());
         }
     }
     // Unused
