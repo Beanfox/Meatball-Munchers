@@ -200,7 +200,7 @@ class TopScores {
         Collections.sort(scores, Collections.reverseOrder()); // Sort the scores from highest to lowest
     }
     // Method to add to the score record (if its a top 5 score)
-    public boolean addScore(int score) {
+    public void addScore(int score) {
         if (scores.size() < 5 || score > scores.get(scores.size()-1)) {
             scores.add(score);
             Collections.sort(scores, Collections.reverseOrder()); // Sort the scores from highest to lowest
@@ -208,11 +208,17 @@ class TopScores {
                 scores.remove(scores.size() - 1); // Remove the lowest score if more than 5
             }
             saveScores();
-            System.out.println(scores);
+        }
+    }
+
+    // Method to check if the score is a record (if its a top 5 score)
+    public boolean checkScore(int score) {
+        if (scores.size() < 5 || score > scores.get(scores.size()-1)) {
             return true;
         }
         return false;
     }
+
     // Method to save the latest scores on file
     private void saveScores() {
         try {
@@ -239,6 +245,7 @@ class GamePlayState extends GameState {
     // Character attributes
     TopScores topScores = new TopScores();
     private boolean ended;
+    private boolean scoreEnded;
     private double bubbleCounterA = 36, bubbleCounterB = 35, bubbleCounterC = 35;
     private int raftChange, raftChangeCounter, sinkSpeed = 1, maxSink = 520; // make this 0 and have win clause change it to 520  
     private int spriteX = 350, spriteY = 455, moveSpeed = 10;; 
@@ -366,9 +373,11 @@ class GamePlayState extends GameState {
 
         // If the character is about to sink, check whether they are to be saved or not
         if (spriteY >= 520) {
-            if (topScores.addScore(score)) {
+            scoreEnded = true;
+            if (topScores.checkScore(score)) {
                 // Run helicopter scene
-                System.out.println("hi");
+                ended = true;
+                topScores.addScore(score);
             } else {
                 maxSink = 600+spriteHeight;
 
@@ -391,6 +400,7 @@ class GamePlayState extends GameState {
                 }
 
                 if (spriteY == 600+spriteHeight) { 
+                    topScores.addScore(score);
                     ended = true;
                     g.setFont(new Font("Arial", Font.BOLD, 130));
                     g.setColor(Color.BLACK);
@@ -521,7 +531,8 @@ class GamePlayState extends GameState {
             // Removes meatballs the character has caught and adds to the counter (based on size of meatball) or removes if rotten
             else if (meatball.getBounds().intersects(new Rectangle(spriteX, spriteY-20 , (5+spriteWidth), (spriteHeight)))) {
                 iterator.remove();
-                score += meatball.isPoison()*Math.round(meatball.getDiam()/5);
+                if (!scoreEnded)
+                    score += meatball.isPoison()*Math.round(meatball.getDiam()/5);
                 if (score<0)
                     score = 0;
                 // Variable shows the character has eaten (will display message next 10 frames)
