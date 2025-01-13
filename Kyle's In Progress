@@ -7,7 +7,14 @@ Purpose: Create an intuitive and polished game for users to eat as many meatball
 
 // Java imports
 import javax.swing.*;
+import java.util.Collections;
 import java.awt.*;
+import java.io.*;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.File;  
+import java.io.FileNotFoundException;  
+import java.util.Scanner;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -73,7 +80,7 @@ class MainMenuState extends GameState {
         int buttonWidth = 100;
         int buttonHeight = 50;
 
-        if (mouseX >= buttonX && mouseX <= buttonX + buttonWidth && mouseY >= buttonY && mouseY <= buttonY + buttonHeight) {
+        if (mouseX >= buttonX && mouseX <= buttonX+buttonWidth && mouseY >= buttonY && mouseY <= buttonY+buttonHeight) {
             panel.setGameState(new GamePlayState());
         }
     }
@@ -96,7 +103,6 @@ class Cloud {
 
     public void draw(Graphics g) {
         g.setColor(Color.WHITE); 
-
         // Cloud include rectangle base and several sized circular tops
         g.fillRect(x, (int) Math.round(y-diameter*.3), (int) Math.round(diameter*2.3), (int) Math.round(diameter/1.4));
         g.fillOval((int) Math.round(x-diameter*0.4), (int) Math.round(y-diameter*0.4), (int) Math.round(diameter*0.8), (int) Math.round(diameter*0.8));
@@ -104,7 +110,6 @@ class Cloud {
         g.fillOval((int) Math.round(x+diameter*0.8), (int) Math.round(y-diameter*1.0), (int) Math.round(diameter*0.8), (int) Math.round(diameter*0.8));
         g.fillOval((int) Math.round(x+diameter*1.4), (int) Math.round(y-diameter*0.8), (int) Math.round(diameter*0.8), (int) Math.round(diameter*0.8));
         g.fillOval((int) Math.round(x+diameter*1.8), (int) Math.round(y-diameter*0.4), (int) Math.round(diameter*0.8), (int) Math.round(diameter*0.8));
-
     }
 
     // Give a cloud its speed
@@ -121,7 +126,7 @@ class Cloud {
 // Class for falling meatballs
 class Meatball {
     private int x, y, diameter, speed;
-    private boolean isPoison; 
+    private boolean isPoison;
 
     // Meatball constructor
     public Meatball(int x, int diameter, boolean isPoison) {
@@ -151,7 +156,7 @@ class Meatball {
         else {
             g.setColor(new Color(153, 0, 0)); // Dark red
         }
-        g.fillOval(x + diameter / 4, y + diameter / 4, diameter / 2, diameter / 2);
+        g.fillOval(x+diameter/4, y+diameter/4, diameter/2, diameter/2);
     }
     
     // Return the space the meatball is taking up (for collision detection)
@@ -174,19 +179,70 @@ class Meatball {
     }
 }
 
+// Class to record top 5 scores ever
+class TopScores {
+    private ArrayList<Integer> scores = new ArrayList<>();
+    // Score list contructor, reads the scores on file
+    public TopScores() {
+        try (BufferedReader scoreReader = new BufferedReader(new FileReader("/Users/kylesaric/Downloads/scoreRecord.txt"))) {
+            String line;
+            while ((line = scoreReader.readLine()) != null) {
+                try {
+                    scores.add(Integer.parseInt(line)); // Parse and add the score
+                } catch (NumberFormatException e) {
+                    // System.out.println("Invalid number format: " + line);
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("An error occurred reading from file.");
+            e.printStackTrace();
+        }
+        Collections.sort(scores, Collections.reverseOrder()); // Sort the scores from highest to lowest
+    }
+    // Method to add to the score record (if its a top 5 score)
+    public boolean addScore(int score) {
+        if (scores.size() < 5 || score > scores.get(scores.size()-1)) {
+            scores.add(score);
+            Collections.sort(scores, Collections.reverseOrder()); // Sort the scores from highest to lowest
+            if (scores.size() > 5) {
+                scores.remove(scores.size() - 1); // Remove the lowest score if more than 5
+            }
+            saveScores();
+            System.out.println(scores);
+            return true;
+        }
+        return false;
+    }
+    // Method to save the latest scores on file
+    private void saveScores() {
+        try {
+            File record = new File("/Users/kylesaric/Downloads/scoreRecord.txt");
+            FileWriter scoreWriter = new FileWriter(record);
+            for (int score : scores) {
+                scoreWriter.write("\n" + score);
+            }
+            scoreWriter.close();
+        } catch (IOException e) {
+            System.out.println("An error occurred writing to file.");
+            e.printStackTrace();
+        }
+        
+    }
+    public ArrayList<Integer> getScores() {
+        return scores;
+    }
+}
+
 // Concrete class for game play
 class GamePlayState extends GameState {
 
     // Character attributes
-    private final int sinkSpeed = 25;
-    private int raftChange = 0;
-    private int raftChangeCounter = 0;
-    private int spriteX = 350;
-    private int spriteY = 455;
-    private final int spriteWidth = 50;
-    private final int spriteHeight = 50;
-    private int moveSpeed = 10;
-    private String openMessage = "";
+    TopScores topScores = new TopScores();
+    private boolean ended;
+    private double bubbleCounterA = 36, bubbleCounterB = 35, bubbleCounterC = 35;
+    private int raftChange, raftChangeCounter, sinkSpeed = 1, maxSink = 520; // make this 0 and have win clause change it to 520  
+    private int spriteX = 350, spriteY = 455, moveSpeed = 10;; 
+    private final int spriteWidth = 50, spriteHeight = 50;
     private int counter = 0;
     
     private static int hasEaten, hasBarfed;
@@ -210,7 +266,6 @@ class GamePlayState extends GameState {
         meatballs = new ArrayList<>();
         clouds = new ArrayList<>();
         random = new Random();
-        openMessage = "CONSUME";
         counter = 100;
     }
 
@@ -223,7 +278,8 @@ class GamePlayState extends GameState {
         }
     }
 
-    @Override
+    @Override 
+    // Draw the gameplay, updating several game components along the way
     public void draw(Graphics g, GamePanel panel) {
 
         // Water
@@ -278,7 +334,7 @@ class GamePlayState extends GameState {
         g.fillOval(731, 555+raftChange, 15, 15);
 
         // Draw the character
-        spriteY = Math.min(455+raftChange, 520);
+        spriteY = Math.min(455+raftChange, maxSink);
         g.setColor(Color.BLACK); 
         g.fillOval(spriteX-2, spriteY-2, spriteWidth+4, spriteHeight+4); // Body
         g.setColor(Color.BLUE); 
@@ -308,6 +364,48 @@ class GamePlayState extends GameState {
             moveSpeed = 2;
         }
 
+        // If the character is about to sink, check whether they are to be saved or not
+        if (spriteY >= 520) {
+            if (topScores.addScore(score)) {
+                // Run helicopter scene
+                System.out.println("hi");
+            } else {
+                maxSink = 600+spriteHeight;
+
+                // Bubble animation
+                if (spriteY > 591) {
+                    g.setColor(Color.WHITE);
+                    if (spriteY-(int)Math.round(bubbleCounterA) > 547) 
+                        g.fillOval(spriteX+27, spriteY-(int)Math.round(bubbleCounterA), 6, 6);
+                    bubbleCounterA += .75;
+                }
+                if (spriteY > 598) {
+                    if (spriteY-(int)Math.round(bubbleCounterB) > 546) 
+                        g.fillOval(spriteX+20, spriteY-(int)Math.round(bubbleCounterB), 8, 8);
+                    bubbleCounterB += .75;
+                }
+                if (spriteY > 605) {
+                    if (spriteY-(int)Math.round(bubbleCounterC) > 546) 
+                        g.fillOval(spriteX+30, spriteY-(int)Math.round(bubbleCounterC), 7, 7);
+                    bubbleCounterC += .75;
+                }
+
+                if (spriteY == 600+spriteHeight) { 
+                    ended = true;
+                    g.setFont(new Font("Arial", Font.BOLD, 130));
+                    g.setColor(Color.BLACK);
+                    g.drawString("YOU", 265, 200);
+                    g.drawString("DROWNED", 55, 350);
+
+                    // Ben pls make good score display w/ top5 scores using TopScores.getScores();
+                    g.drawRect(350, 390, 100, 40);
+                    g.setFont(new Font("Arial", Font.BOLD, 24));
+                    g.drawString("Menu", 368, 420);
+                }
+            }
+        }
+    
+
         // If the character has eaten within the last 10 frames, display an eating message
         if (hasEaten>0) {
             hasEaten--;
@@ -334,20 +432,21 @@ class GamePlayState extends GameState {
         }
 
         // Draw the meatball counter in the top right hand corner
-        g.setColor(Color.BLACK);
-        g.setFont(new Font("Arial", Font.PLAIN, 18));
-        g.drawString("Meatball Score: " + score, 630, 30);
-
+        if (!ended) {
+            g.setColor(Color.BLACK);
+            g.setFont(new Font("Arial", Font.PLAIN, 18));
+            g.drawString("Meatball Score: " + score, 630, 30);
+        }
         // Present the opening "Consume" message for the first 100 frames (~1.5 sec)
         if (counter>0) {
             counter--;
             g.setFont(new Font("Arial", Font.BOLD, 130));
             if (counter < 75)
-                g.drawString(openMessage, 60, 180);
+                g.drawString("CONSUME", 60, 180);
             if (counter < 50)
-                g.drawString(openMessage, 60, 310);
+                g.drawString("CONSUME", 60, 310);
             if (counter < 25)
-                g.drawString(openMessage, 60, 440);
+                g.drawString("CONSUME", 60, 440);
         }
     
     }
@@ -364,8 +463,10 @@ class GamePlayState extends GameState {
             moveLeft = true;
         else if (keyCode == KeyEvent.VK_RIGHT) {
             moveRight = true;
-        } else if (keyCode == KeyEvent.VK_P) {
+        } else if (keyCode == KeyEvent.VK_P && !ended) {
             panel.setGameState(new PauseMenuState(this));
+        } else if (keyCode == KeyEvent.VK_R && ended) {
+            panel.setGameState(new MainMenuState());
         }
     }
 
@@ -383,18 +484,18 @@ class GamePlayState extends GameState {
 
         // Moves character left and right at their speed, within the bounds of the panel
         if (moveLeft == true) 
-            spriteX = Math.max(spriteX - moveSpeed, 25);
+            spriteX = Math.max(spriteX-moveSpeed, 25);
         if (moveRight == true) 
-            spriteX = Math.min(spriteX + moveSpeed, 775 - spriteWidth);
+            spriteX = Math.min(spriteX+moveSpeed, 775-spriteWidth);
 
         // Randomly generate a meatball (1/25 chance every frame, 1 frame every 16 ms, avg 2.5 meatballs ever second)
-        if (random.nextInt(25) == 0) { 
+        if (random.nextInt(25) == 0 && !ended) { 
             int x = random.nextInt(740);
             meatballs.add(new Meatball(x, (30+random.nextInt(10)), random.nextBoolean()));
         }
 
         // Randomly generate a cloud 
-        if (random.nextInt(300) == 0) { // make to 300 pls code that ***///*** 
+        if (random.nextInt(300) == 0 && !ended) { 
             int y = random.nextInt(200) + 25; 
             clouds.add(new Cloud(y, (40+random.nextInt(15))));
         }
@@ -417,8 +518,8 @@ class GamePlayState extends GameState {
             if (meatball.isOffScreen())
                 iterator.remove();
 
-            // Removes meatballs the character has caught and adds to the counter (based on size of meatball)
-            else if (meatball.getBounds().intersects(new Rectangle(spriteX, spriteY , (5+spriteWidth), (spriteHeight)))) {
+            // Removes meatballs the character has caught and adds to the counter (based on size of meatball) or removes if rotten
+            else if (meatball.getBounds().intersects(new Rectangle(spriteX, spriteY-20 , (5+spriteWidth), (spriteHeight)))) {
                 iterator.remove();
                 score += meatball.isPoison()*Math.round(meatball.getDiam()/5);
                 if (score<0)
@@ -475,7 +576,7 @@ class PauseMenuState extends GameState {
         }
 
         // If the user clicks restart, return to the main menu
-        if (mouseX >= buttonX && mouseX <= buttonX+buttonWidth && mouseY >= restartButtonY && mouseY <= restartButtonY + buttonHeight) {
+        if (mouseX >= buttonX && mouseX <= buttonX+buttonWidth && mouseY >= restartButtonY && mouseY <= restartButtonY+buttonHeight) {
             panel.setGameState(new MainMenuState());
         }
     }
