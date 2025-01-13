@@ -260,15 +260,15 @@ class Cloud {
 // Class for falling meatballs
 class Meatball {
     private int x, y, diameter, speed;
-    private boolean isPoison;
+    private int randType;
 
     // Meatball constructor
-    public Meatball(int x, int diameter, boolean isPoison) {
+    public Meatball(int x, int diameter, int randType) {
         this.x = x;
         this.y = 0;
         this.diameter = diameter;
         this.speed = 5;
-        this.isPoison = isPoison;
+        this.randType = randType;
     }
     
     // Give a meatball its speed
@@ -278,16 +278,16 @@ class Meatball {
 
     // Draw a meatball
     public void draw(Graphics g) {
-        if (isPoison) 
+        if (randType == 1) 
             g.setColor(new Color(51, 204, 0)); // Green
-        else {
+        else if (randType == 2 || randType == 3) {
             g.setColor(new Color(204, 51, 0)); // Red
         }
         g.fillOval(x, y, diameter, diameter);
 
-        if (isPoison) 
+        if (randType == 1) 
             g.setColor(new Color(0, 102, 0)); // Dark green
-        else {
+        else if (randType == 2 || randType == 3){
             g.setColor(new Color(153, 0, 0)); // Dark red
         }
         g.fillOval(x+diameter/4, y+diameter/4, diameter/2, diameter/2);
@@ -304,7 +304,14 @@ class Meatball {
     }
 
     public int isPoison() {
-        return isPoison?-1:1;
+        if (randType == 1){
+            return -1;
+        }
+        else if (randType == 2 || randType == 3){
+            return 1;
+        }
+        //if it somehow doesnt hit any of the if statements
+        return 1;
     }
 
     // Check if the meatball has fallen past the floor
@@ -367,12 +374,26 @@ class TopScores {
     }
 }
 
+class DieState extends GameState {
+    @Override 
+    // Draw the gameplay, updating several game components along the way
+    public void draw(Graphics g, GamePanel panel) {
+    
+    }
+    // Unused
+    @Override
+    public void handleClick(MouseEvent e, GamePanel panel) {
+    
+    }
+}
+
 // Concrete class for game play
 class GamePlayState extends GameState {
 
     // Character attributes
     TopScores topScores = new TopScores();
     private boolean ended;
+    private boolean scoreEnded;
     private double bubbleCounterA = 36, bubbleCounterB = 35, bubbleCounterC = 35;
     private int raftChange, raftChangeCounter, sinkSpeed = 1, maxSink = 520; // make this 0 and have win clause change it to 520  
     private int spriteX = 350, spriteY = 455, moveSpeed = 10;; 
@@ -407,8 +428,11 @@ class GamePlayState extends GameState {
     public static void eats(int type) {
         if (type == 1)
             hasEaten = 10;
-        else {
+        else if (type == -1){
             hasBarfed = 10;
+        }
+        else if (type == 2){
+            
         }
     }
 
@@ -500,8 +524,10 @@ class GamePlayState extends GameState {
 
         // If the character is about to sink, check whether they are to be saved or not
         if (spriteY >= 520) {
+            scoreEnded = true;
             if (topScores.addScore(score)) {
                 // Run helicopter scene
+                ended = true;
                 System.out.println("hi");
             } else {
                 maxSink = 600+spriteHeight;
@@ -637,7 +663,7 @@ class GamePlayState extends GameState {
         // Randomly generate a meatball (1/25 chance every frame, 1 frame every 16 ms, avg 2.5 meatballs ever second)
         if (random.nextInt(25) == 0 && !ended) { 
             int x = random.nextInt(740);
-            meatballs.add(new Meatball(x, (30+random.nextInt(10)), random.nextBoolean()));
+            meatballs.add(new Meatball(x, (30+random.nextInt(10)), random.nextInt(4)));
         }
 
         // Randomly generate a cloud 
@@ -667,7 +693,8 @@ class GamePlayState extends GameState {
             // Removes meatballs the character has caught and adds to the counter (based on size of meatball) or removes if rotten
             else if (meatball.getBounds().intersects(new Rectangle(spriteX, spriteY-20 , (5+spriteWidth), (spriteHeight)))) {
                 iterator.remove();
-                score += meatball.isPoison()*Math.round(meatball.getDiam()/5);
+                if (!scoreEnded)
+                    score += meatball.isPoison()*Math.round(meatball.getDiam()/5);
                 if (score<0)
                     score = 0;
                 // Variable shows the character has eaten (will display message next 10 frames)
