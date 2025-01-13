@@ -73,8 +73,12 @@ class MainMenuState extends GameState {
         g.drawString("How to Play", 335, 390);
 
         g.setFont(new Font("Arial", Font.PLAIN, 24));
-        g.drawRect(350, 425, 100, 50);
-        g.drawString("Quit", 370, 460);
+        g.drawRect(325, 425, 150, 50);
+        g.drawString("High Scores", 335, 460);
+
+        g.setFont(new Font("Arial", Font.PLAIN, 24));
+        g.drawRect(350, 495, 100, 50);
+        g.drawString("Quit", 375, 530);
     }
 
     @Override
@@ -88,8 +92,10 @@ class MainMenuState extends GameState {
         int howToPlayButtonX = 350;
         int howToPlayButtonY = 355;
         int howToPlayButtonWidth = 150;
+        int highScoreButtonX = 325;
+        int highScoreButtonY = 425;
         int quitButtonX = 350;
-        int quitButtonY = 425;
+        int quitButtonY = 495;
 
         int buttonWidth = 100;
         int buttonHeight = 50;
@@ -100,8 +106,51 @@ class MainMenuState extends GameState {
         if (mouseX >= howToPlayButtonX && mouseX <= howToPlayButtonX + howToPlayButtonWidth && mouseY >= howToPlayButtonY && mouseY <= howToPlayButtonY + buttonHeight) {
             panel.setGameState(new HowToPlayState());
         }
+        if (mouseX >= highScoreButtonX && mouseX <= highScoreButtonX + howToPlayButtonWidth && mouseY >= highScoreButtonY && mouseY <= highScoreButtonY + buttonHeight) {
+            panel.setGameState(new HighScoreState());
+        }
         if (mouseX >= quitButtonX && mouseX <= quitButtonX + buttonWidth && mouseY >= quitButtonY && mouseY <= quitButtonY + buttonHeight) {
             System.exit(0);
+        }
+    }
+    // Unused
+    @Override
+    public void handleKeyPress(int keyCode, GamePanel panel) {}
+}
+
+class HighScoreState extends GameState{
+    TopScores topScores = new TopScores();
+
+    @Override
+    public void draw(Graphics g, GamePanel panel) {
+        g.setColor(Color.BLACK);
+        g.setFont(new Font("Arial", Font.BOLD, 24));
+        g.drawRect(330, 65, 100, 170);
+        g.drawString("1 - " + topScores.getScores().get(0), 350, 100);
+        g.drawString("2 - " + topScores.getScores().get(1), 350,  130);
+        g.drawString("3 - " + topScores.getScores().get(2), 350, 160);
+        g.drawString("4 - " + topScores.getScores().get(3), 350, 190);
+        g.drawString("5 - " + topScores.getScores().get(4), 350, 220);
+
+        g.setFont(new Font("Arial", Font.PLAIN, 24));
+        g.drawRect(330, 250, 100, 50);
+        g.drawString("Menu", 350, 285);
+    }
+
+    @Override
+    // Start the game if the user clicks the start button
+    public void handleClick(MouseEvent e, GamePanel panel) {
+        int mouseX = e.getX();
+        int mouseY = e.getY();
+
+        int backToMenuButtonX = 350;
+        int backToMenuButtonY = 250;
+
+        int buttonWidth = 100;
+        int buttonHeight = 50;
+
+        if (mouseX >= backToMenuButtonX && mouseX <= backToMenuButtonX + buttonWidth && mouseY >= backToMenuButtonY && mouseY <= backToMenuButtonY + buttonHeight) {
+            panel.setGameState(new MainMenuState());
         }
     }
     // Unused
@@ -269,7 +318,7 @@ class TopScores {
     private ArrayList<Integer> scores = new ArrayList<>();
     // Score list contructor, reads the scores on file
     public TopScores() {
-        try (BufferedReader scoreReader = new BufferedReader(new FileReader("/Users/kylesaric/Downloads/scoreRecord.txt"))) {
+        try (BufferedReader scoreReader = new BufferedReader(new FileReader("C:\\Users\\728322\\OneDrive - Peel District School Board\\Desktop\\MeatballMunchers\\src\\ScoreRecord.txt"))) {
             String line;
             while ((line = scoreReader.readLine()) != null) {
                 try {
@@ -301,7 +350,7 @@ class TopScores {
     // Method to save the latest scores on file
     private void saveScores() {
         try {
-            File record = new File("/Users/kylesaric/Downloads/scoreRecord.txt");
+            File record = new File("C:\\Users\\728322\\OneDrive - Peel District School Board\\Desktop\\MeatballMunchers\\src\\ScoreRecord.txt");
             FileWriter scoreWriter = new FileWriter(record);
             for (int score : scores) {
                 scoreWriter.write("\n" + score);
@@ -539,6 +588,18 @@ class GamePlayState extends GameState {
     // Unused
     @Override
     public void handleClick(MouseEvent e, GamePanel panel) {
+        int mouseX = e.getX();
+        int mouseY = e.getY();
+
+        int backToMenuButtonX = 350;
+        int backToMenuButtonY = 390;
+
+        int buttonWidth = 100;
+        int buttonHeight = 40;
+
+        if (mouseX >= backToMenuButtonX && mouseX <= backToMenuButtonX + buttonWidth && mouseY >= backToMenuButtonY && mouseY <= backToMenuButtonY + buttonHeight) {
+            panel.setGameState(new MainMenuState());
+        }
     }
 
     @Override
