@@ -341,7 +341,7 @@ class TopScores {
         Collections.sort(scores, Collections.reverseOrder()); // Sort the scores from highest to lowest
     }
     // Method to add to the score record (if its a top 5 score)
-    public boolean addScore(int score) {
+    public void addScore(int score) {
         if (scores.size() < 5 || score > scores.get(scores.size()-1)) {
             scores.add(score);
             Collections.sort(scores, Collections.reverseOrder()); // Sort the scores from highest to lowest
@@ -349,7 +349,12 @@ class TopScores {
                 scores.remove(scores.size() - 1); // Remove the lowest score if more than 5
             }
             saveScores();
-            System.out.println(scores);
+        }
+    }
+
+    // Method to check if the score is a record (if its a top 5 score)
+    public boolean checkScore(int score) {
+        if (scores.size() < 5 || score > scores.get(scores.size()-1)) {
             return true;
         }
         return false;
@@ -525,9 +530,10 @@ class GamePlayState extends GameState {
         // If the character is about to sink, check whether they are to be saved or not
         if (spriteY >= 520) {
             scoreEnded = true;
-            if (topScores.addScore(score)) {
+            if (topScores.checkScore(score)) {
                 // Run helicopter scene
                 ended = true;
+                topScores.addScore(score);
                 System.out.println("hi");
             } else {
                 maxSink = 600+spriteHeight;
@@ -552,6 +558,7 @@ class GamePlayState extends GameState {
 
                 if (spriteY == 600+spriteHeight) { 
                     ended = true;
+                    topScores.addScore(score);
                     g.setFont(new Font("Arial", Font.BOLD, 130));
                     g.setColor(Color.BLACK);
                     g.drawString("YOU", 265, 200);
