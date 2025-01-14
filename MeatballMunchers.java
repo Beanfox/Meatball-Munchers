@@ -354,7 +354,7 @@ class TopScores {
     private ArrayList<Integer> scores = new ArrayList<>();
     // Score list contructor, reads the scores on file
     public TopScores() {
-        try (BufferedReader scoreReader = new BufferedReader(new FileReader("MeatballMunchers\\src\\ScoreRecord.txt"))) {
+        try (BufferedReader scoreReader = new BufferedReader(new FileReader("src\\scoreRecord.txt"))) {
             String line;
             while ((line = scoreReader.readLine()) != null) {
                 try {
@@ -391,7 +391,7 @@ class TopScores {
     // Method to save the latest scores on file
     private void saveScores() {
         try {
-            File record = new File("MeatballMunchers\\src\\ScoreRecord.txt");
+            File record = new File("src\\scoreRecord.txt");
             FileWriter scoreWriter = new FileWriter(record);
             for (int score : scores) {
                 scoreWriter.write("\n" + score);
