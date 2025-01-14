@@ -1,3 +1,4 @@
+
 /* 
 Program Name: MeatballMunchers.java
 Names: Kyle Saric & Ben Brake
@@ -325,7 +326,7 @@ class TopScores {
     private ArrayList<Integer> scores = new ArrayList<>();
     // Score list contructor, reads the scores on file
     public TopScores() {
-        try (BufferedReader scoreReader = new BufferedReader(new FileReader("C:\\Users\\728322\\OneDrive - Peel District School Board\\Desktop\\MeatballMunchers\\src\\ScoreRecord.txt"))) {
+        try (BufferedReader scoreReader = new BufferedReader(new FileReader("MeatballMunchers\\src\\ScoreRecord.txt"))) {
             String line;
             while ((line = scoreReader.readLine()) != null) {
                 try {
@@ -362,7 +363,7 @@ class TopScores {
     // Method to save the latest scores on file
     private void saveScores() {
         try {
-            File record = new File("C:\\Users\\728322\\OneDrive - Peel District School Board\\Desktop\\MeatballMunchers\\src\\ScoreRecord.txt");
+            File record = new File("MeatballMunchers\\src\\ScoreRecord.txt");
             FileWriter scoreWriter = new FileWriter(record);
             for (int score : scores) {
                 scoreWriter.write("\n" + score);
@@ -670,7 +671,7 @@ class GamePlayState extends GameState {
         // Randomly generate a meatball (1/25 chance every frame, 1 frame every 16 ms, avg 2.5 meatballs ever second)
         if (random.nextInt(25) == 0 && !ended) { 
             int x = random.nextInt(740);
-            meatballs.add(new Meatball(x, (30+random.nextInt(10)), random.nextInt(4)));
+            meatballs.add(new Meatball(x, (30+random.nextInt(10)), random.nextInt(3)+1));
         }
 
         // Randomly generate a cloud 
