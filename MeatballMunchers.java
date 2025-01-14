@@ -89,14 +89,14 @@ class MainMenuState extends GameState {
         int mouseY = e.getY();
 
         int startButtonX = 350;
-        int startButtonY = 285;
+        int startButtonY = 235;
         int howToPlayButtonX = 350;
-        int howToPlayButtonY = 355;
+        int howToPlayButtonY = 305;
         int howToPlayButtonWidth = 150;
         int highScoreButtonX = 325;
-        int highScoreButtonY = 425;
+        int highScoreButtonY = 375;
         int quitButtonX = 350;
-        int quitButtonY = 495;
+        int quitButtonY = 445;
 
         int buttonWidth = 100;
         int buttonHeight = 50;
