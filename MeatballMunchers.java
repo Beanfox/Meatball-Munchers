@@ -125,17 +125,21 @@ class HighScoreState extends GameState{
     @Override
     public void draw(Graphics g, GamePanel panel) {
         g.setColor(Color.BLACK);
+        g.setFont(new Font("Arial", Font.BOLD, 36));
+        g.drawString("Leaderboard", 290, 200);
+
+        g.setColor(Color.BLACK);
         g.setFont(new Font("Arial", Font.BOLD, 24));
-        g.drawRect(330, 65, 100, 170);
-        g.drawString("1 - " + topScores.getScores().get(0), 350, 100);
-        g.drawString("2 - " + topScores.getScores().get(1), 350,  130);
-        g.drawString("3 - " + topScores.getScores().get(2), 350, 160);
-        g.drawString("4 - " + topScores.getScores().get(3), 350, 190);
-        g.drawString("5 - " + topScores.getScores().get(4), 350, 220);
+        g.drawRect(348, 225, 100, 170);
+        g.drawString("1 - " + topScores.getScores().get(0), 368, 260);
+        g.drawString("2 - " + topScores.getScores().get(1), 368,  290);
+        g.drawString("3 - " + topScores.getScores().get(2), 368, 320);
+        g.drawString("4 - " + topScores.getScores().get(3), 368, 350);
+        g.drawString("5 - " + topScores.getScores().get(4), 368, 380);
 
         g.setFont(new Font("Arial", Font.PLAIN, 24));
-        g.drawRect(330, 250, 100, 50);
-        g.drawString("Menu", 350, 285);
+        g.drawRect(350, 410, 100, 50);
+        g.drawString("Menu", 368, 445);
     }
 
     @Override
