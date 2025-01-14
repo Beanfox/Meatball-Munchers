@@ -63,23 +63,23 @@ class MainMenuState extends GameState {
     public void draw(Graphics g, GamePanel panel) {
         g.setColor(Color.BLACK);
         g.setFont(new Font("Arial", Font.BOLD, 36));
-        g.drawString("Meatball Munchers", 240, 250);
+        g.drawString("Meatball Munchers", 240, 200);
 
         g.setFont(new Font("Arial", Font.PLAIN, 24));
-        g.drawRect(350, 285, 100, 50);
-        g.drawString("Start", 370, 320);
+        g.drawRect(350, 235, 100, 50);
+        g.drawString("Start", 370, 270);
 
         g.setFont(new Font("Arial", Font.PLAIN, 24));
-        g.drawRect(325, 355, 150, 50);
-        g.drawString("How to Play", 335, 390);
+        g.drawRect(325, 305, 150, 50);
+        g.drawString("How to Play", 335, 340);
 
         g.setFont(new Font("Arial", Font.PLAIN, 24));
-        g.drawRect(325, 425, 150, 50);
-        g.drawString("High Scores", 335, 460);
+        g.drawRect(325, 375, 150, 50);
+        g.drawString("Leaderboard", 333, 410);
 
         g.setFont(new Font("Arial", Font.PLAIN, 24));
-        g.drawRect(350, 495, 100, 50);
-        g.drawString("Quit", 375, 530);
+        g.drawRect(350, 445, 100, 50);
+        g.drawString("Quit", 375, 480);
     }
 
     @Override
