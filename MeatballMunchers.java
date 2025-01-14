@@ -179,14 +179,14 @@ class HowToPlayState extends GameState{
 
         g.setColor(Color.BLACK);
         g.setFont(new Font("Arial", Font.BOLD, 24));
-        g.drawString("Spiked Meatball", 50, 400);
+        g.drawString("Spiked Meatball", 50, 430);
         g.setFont(new Font("Arial", Font.PLAIN, 24));
-        g.drawString("kills player", 80, 450);
+        g.drawString("kills player", 80, 480);
 
         g.setFont(new Font("Arial", Font.BOLD, 24));
-        g.drawString("Speed Meatball", 540, 400);
+        g.drawString("Speed Meatball", 540, 430);
         g.setFont(new Font("Arial", Font.PLAIN, 24));
-        g.drawString("movement speed up", 520, 450);
+        g.drawString("movement speed up", 520, 480);
 
         g.setFont(new Font("Arial", Font.PLAIN, 24));
         g.drawRect(350, 250, 100, 50);
