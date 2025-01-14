@@ -185,9 +185,9 @@ class HowToPlayState extends GameState{
         g.drawString("movement speed up", 520, 450);
 
         g.setFont(new Font("Arial", Font.PLAIN, 24));
-        g.drawRect(330, 250, 100, 50);
-        g.drawString("Menu", 350, 285);
-
+        g.drawRect(350, 250, 100, 50);
+        g.drawString("Menu", 368, 285);
+        
         g.setColor(new Color(51, 204, 0)); // Green
         g.fillOval(600, 135, 75, 75);
         g.setColor(new Color(0, 102, 0)); // Dark green
