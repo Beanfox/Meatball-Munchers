@@ -426,7 +426,6 @@ class DieState extends GameState {
         g.setFont(new Font("Arial", Font.BOLD, 24));
         g.drawString("Menu", 368, 420);
     }
-    // Unused
     @Override
     public void handleClick(MouseEvent e, GamePanel panel) {
         int mouseX = e.getX();
