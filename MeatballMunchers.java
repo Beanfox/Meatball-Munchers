@@ -460,7 +460,7 @@ class GamePlayState extends GameState {
     private boolean scoreEnded;
     private double bubbleCounterA = 36, bubbleCounterB = 35, bubbleCounterC = 35;
     private int raftChange, raftChangeCounter, sinkSpeed = 1, maxSink = 520; // make this 0 and have win clause change it to 520  
-    private int spriteX = 350, spriteY = 455;'
+    private int spriteX = 350, spriteY = 455;
     public static int moveSpeed = 10;
     private final int spriteWidth = 50, spriteHeight = 50;
     private int counter = 0;
