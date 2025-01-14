@@ -1,3 +1,4 @@
+
 /* 
 Program Name: MeatballMunchers.java
 Names: Kyle Saric & Ben Brake
@@ -62,11 +63,23 @@ class MainMenuState extends GameState {
     public void draw(Graphics g, GamePanel panel) {
         g.setColor(Color.BLACK);
         g.setFont(new Font("Arial", Font.BOLD, 36));
-        g.drawString("Meatball Munchers", 240, 250);
+        g.drawString("Meatball Munchers", 240, 200);
 
         g.setFont(new Font("Arial", Font.PLAIN, 24));
-        g.drawRect(350, 285, 100, 50);
-        g.drawString("Start", 370, 320);
+        g.drawRect(350, 235, 100, 50);
+        g.drawString("Start", 370, 270);
+
+        g.setFont(new Font("Arial", Font.PLAIN, 24));
+        g.drawRect(325, 305, 150, 50);
+        g.drawString("How to Play", 335, 340);
+
+        g.setFont(new Font("Arial", Font.PLAIN, 24));
+        g.drawRect(325, 375, 150, 50);
+        g.drawString("Leaderboard", 333, 410);
+
+        g.setFont(new Font("Arial", Font.PLAIN, 24));
+        g.drawRect(350, 445, 100, 50);
+        g.drawString("Quit", 375, 480);
     }
 
     @Override
@@ -75,13 +88,139 @@ class MainMenuState extends GameState {
         int mouseX = e.getX();
         int mouseY = e.getY();
 
-        int buttonX = 350;
-        int buttonY = 285;
+        int startButtonX = 350;
+        int startButtonY = 235;
+        int howToPlayButtonX = 350;
+        int howToPlayButtonY = 305;
+        int howToPlayButtonWidth = 150;
+        int highScoreButtonX = 325;
+        int highScoreButtonY = 375;
+        int quitButtonX = 350;
+        int quitButtonY = 445;
+
         int buttonWidth = 100;
         int buttonHeight = 50;
 
-        if (mouseX >= buttonX && mouseX <= buttonX+buttonWidth && mouseY >= buttonY && mouseY <= buttonY+buttonHeight) {
+        if (mouseX >= startButtonX && mouseX <= startButtonX + buttonWidth && mouseY >= startButtonY && mouseY <= startButtonY + buttonHeight) {
             panel.setGameState(new GamePlayState());
+        }
+        if (mouseX >= howToPlayButtonX && mouseX <= howToPlayButtonX + howToPlayButtonWidth && mouseY >= howToPlayButtonY && mouseY <= howToPlayButtonY + buttonHeight) {
+            panel.setGameState(new HowToPlayState());
+        }
+        if (mouseX >= highScoreButtonX && mouseX <= highScoreButtonX + howToPlayButtonWidth && mouseY >= highScoreButtonY && mouseY <= highScoreButtonY + buttonHeight) {
+            panel.setGameState(new HighScoreState());
+        }
+        if (mouseX >= quitButtonX && mouseX <= quitButtonX + buttonWidth && mouseY >= quitButtonY && mouseY <= quitButtonY + buttonHeight) {
+            System.exit(0);
+        }
+    }
+    // Unused
+    @Override
+    public void handleKeyPress(int keyCode, GamePanel panel) {}
+}
+
+class HighScoreState extends GameState{
+    TopScores topScores = new TopScores();
+
+    @Override
+    public void draw(Graphics g, GamePanel panel) {
+        g.setColor(Color.BLACK);
+        g.setFont(new Font("Arial", Font.BOLD, 36));
+        g.drawString("Leaderboard", 290, 200);
+
+        g.setColor(Color.BLACK);
+        g.setFont(new Font("Arial", Font.BOLD, 24));
+        g.drawRect(348, 225, 100, 170);
+        g.drawString("1 - " + topScores.getScores().get(0), 368, 260);
+        g.drawString("2 - " + topScores.getScores().get(1), 368,  290);
+        g.drawString("3 - " + topScores.getScores().get(2), 368, 320);
+        g.drawString("4 - " + topScores.getScores().get(3), 368, 350);
+        g.drawString("5 - " + topScores.getScores().get(4), 368, 380);
+
+        g.setFont(new Font("Arial", Font.PLAIN, 24));
+        g.drawRect(348, 410, 100, 50);
+        g.drawString("Menu", 368, 445);
+    }
+
+    @Override
+    // Start the game if the user clicks the start button
+    public void handleClick(MouseEvent e, GamePanel panel) {
+        int mouseX = e.getX();
+        int mouseY = e.getY();
+
+        int backToMenuButtonX = 368;
+        int backToMenuButtonY = 410;
+
+        int buttonWidth = 100;
+        int buttonHeight = 50;
+
+        if (mouseX >= backToMenuButtonX && mouseX <= backToMenuButtonX + buttonWidth && mouseY >= backToMenuButtonY && mouseY <= backToMenuButtonY + buttonHeight) {
+            panel.setGameState(new MainMenuState());
+        }
+    }
+    // Unused
+    @Override
+    public void handleKeyPress(int keyCode, GamePanel panel) {}
+}
+
+class HowToPlayState extends GameState{
+    @Override
+    public void draw(Graphics g, GamePanel panel) {
+        g.setColor(Color.BLACK);
+        g.setFont(new Font("Arial", Font.BOLD, 24));
+        g.drawString("Normal Meatball", 50, 50);
+        g.setFont(new Font("Arial", Font.PLAIN, 24));
+        g.drawString("collect to gain points", 35, 100);
+
+        g.setFont(new Font("Arial", Font.BOLD, 24));
+        g.drawString("Rotten Meatball", 545, 50);
+        g.setFont(new Font("Arial", Font.PLAIN, 24));
+        g.drawString("collect to lose points", 525, 100);
+
+        g.setColor(Color.BLACK);
+        g.setFont(new Font("Arial", Font.BOLD, 24));
+        g.drawString("Spiked Meatball", 50, 400);
+        g.setFont(new Font("Arial", Font.PLAIN, 24));
+        g.drawString("kills player", 80, 450);
+
+        g.setFont(new Font("Arial", Font.BOLD, 24));
+        g.drawString("Speed Meatball", 540, 400);
+        g.setFont(new Font("Arial", Font.PLAIN, 24));
+        g.drawString("movement speed up", 520, 450);
+
+        g.setFont(new Font("Arial", Font.PLAIN, 24));
+        g.drawRect(348, 250, 100, 50);
+        g.drawString("Menu", 368, 285);
+
+        g.setColor(new Color(51, 204, 0)); // Green
+        g.fillOval(600, 135, 75, 75);
+        g.setColor(new Color(0, 102, 0)); // Dark green
+        g.fillOval(600 + 75 / 4, 135 + 75 / 4, 75 / 2, 75 / 2);
+
+        g.setColor(new Color(204, 51, 0)); // Red
+        g.fillOval(95, 135, 75, 75);
+        g.setColor(new Color(153, 0, 0)); // Dark red
+        g.fillOval(95 + 75 / 4, 135 + 75 / 4, 75 / 2, 75 / 2);
+
+        /*
+         * ADD THE OTHER TWO MEATBALLS/OBJECTS
+         */
+    }
+
+    @Override
+    // Start the game if the user clicks the start button
+    public void handleClick(MouseEvent e, GamePanel panel) {
+        int mouseX = e.getX();
+        int mouseY = e.getY();
+
+        int backToMenuButtonX = 350;
+        int backToMenuButtonY = 250;
+
+        int buttonWidth = 100;
+        int buttonHeight = 50;
+
+        if (mouseX >= backToMenuButtonX && mouseX <= backToMenuButtonX + buttonWidth && mouseY >= backToMenuButtonY && mouseY <= backToMenuButtonY + buttonHeight) {
+            panel.setGameState(new MainMenuState());
         }
     }
     // Unused
@@ -126,15 +265,15 @@ class Cloud {
 // Class for falling meatballs
 class Meatball {
     private int x, y, diameter, speed;
-    private boolean isPoison;
+    private int randType;
 
     // Meatball constructor
-    public Meatball(int x, int diameter, boolean isPoison) {
+    public Meatball(int x, int diameter, int randType) {
         this.x = x;
         this.y = 0;
         this.diameter = diameter;
         this.speed = 5;
-        this.isPoison = isPoison;
+        this.randType = randType;
     }
     
     // Give a meatball its speed
@@ -144,16 +283,16 @@ class Meatball {
 
     // Draw a meatball
     public void draw(Graphics g) {
-        if (isPoison) 
+        if (randType == 1) 
             g.setColor(new Color(51, 204, 0)); // Green
-        else {
+        else if (randType == 2 || randType == 3) {
             g.setColor(new Color(204, 51, 0)); // Red
         }
         g.fillOval(x, y, diameter, diameter);
 
-        if (isPoison) 
+        if (randType == 1) 
             g.setColor(new Color(0, 102, 0)); // Dark green
-        else {
+        else if (randType == 2 || randType == 3){
             g.setColor(new Color(153, 0, 0)); // Dark red
         }
         g.fillOval(x+diameter/4, y+diameter/4, diameter/2, diameter/2);
@@ -170,7 +309,14 @@ class Meatball {
     }
 
     public int isPoison() {
-        return isPoison?-1:1;
+        if (randType == 1){
+            return -1;
+        }
+        else if (randType == 2 || randType == 3){
+            return 1;
+        }
+        //if it somehow doesnt hit any of the if statements
+        return 1;
     }
 
     // Check if the meatball has fallen past the floor
@@ -184,7 +330,7 @@ class TopScores {
     private ArrayList<Integer> scores = new ArrayList<>();
     // Score list contructor, reads the scores on file
     public TopScores() {
-        try (BufferedReader scoreReader = new BufferedReader(new FileReader("/Users/kylesaric/Downloads/scoreRecord.txt"))) {
+        try (BufferedReader scoreReader = new BufferedReader(new FileReader("MeatballMunchers\\src\\ScoreRecord.txt"))) {
             String line;
             while ((line = scoreReader.readLine()) != null) {
                 try {
@@ -218,11 +364,10 @@ class TopScores {
         }
         return false;
     }
-
     // Method to save the latest scores on file
     private void saveScores() {
         try {
-            File record = new File("/Users/kylesaric/Downloads/scoreRecord.txt");
+            File record = new File("MeatballMunchers\\src\\ScoreRecord.txt");
             FileWriter scoreWriter = new FileWriter(record);
             for (int score : scores) {
                 scoreWriter.write("\n" + score);
@@ -236,6 +381,19 @@ class TopScores {
     }
     public ArrayList<Integer> getScores() {
         return scores;
+    }
+}
+
+class DieState extends GameState {
+    @Override 
+    // Draw the gameplay, updating several game components along the way
+    public void draw(Graphics g, GamePanel panel) {
+    
+    }
+    // Unused
+    @Override
+    public void handleClick(MouseEvent e, GamePanel panel) {
+    
     }
 }
 
@@ -280,8 +438,11 @@ class GamePlayState extends GameState {
     public static void eats(int type) {
         if (type == 1)
             hasEaten = 10;
-        else {
+        else if (type == -1){
             hasBarfed = 10;
+        }
+        else if (type == 2){
+            
         }
     }
 
@@ -400,8 +561,8 @@ class GamePlayState extends GameState {
                 }
 
                 if (spriteY == 600+spriteHeight) { 
-                    topScores.addScore(score);
                     ended = true;
+                    topScores.addScore(score);
                     g.setFont(new Font("Arial", Font.BOLD, 130));
                     g.setColor(Color.BLACK);
                     g.drawString("YOU", 265, 200);
@@ -463,8 +624,7 @@ class GamePlayState extends GameState {
 
     // Unused
     @Override
-    public void handleClick(MouseEvent e, GamePanel panel) {
-    }
+    public void handleClick(MouseEvent e, GamePanel panel) {}
 
     @Override
     // Controls to move the character left and right across the screen or enter the pause menu with p
@@ -501,7 +661,7 @@ class GamePlayState extends GameState {
         // Randomly generate a meatball (1/25 chance every frame, 1 frame every 16 ms, avg 2.5 meatballs ever second)
         if (random.nextInt(25) == 0 && !ended) { 
             int x = random.nextInt(740);
-            meatballs.add(new Meatball(x, (30+random.nextInt(10)), random.nextBoolean()));
+            meatballs.add(new Meatball(x, (30+random.nextInt(10)), random.nextInt(3)+1));
         }
 
         // Randomly generate a cloud 
