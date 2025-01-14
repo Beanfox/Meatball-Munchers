@@ -149,7 +149,7 @@ class HighScoreState extends GameState{
         int mouseY = e.getY();
 
         int backToMenuButtonX = 350;
-        int backToMenuButtonY = 250;
+        int backToMenuButtonY = 410;
 
         int buttonWidth = 100;
         int buttonHeight = 50;
