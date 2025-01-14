@@ -198,9 +198,15 @@ class HowToPlayState extends GameState{
         g.setColor(new Color(153, 0, 0)); // Dark red
         g.fillOval(95 + 75 / 4, 135 + 75 / 4, 75 / 2, 75 / 2);
 
-        /*
-         * ADD THE OTHER TWO MEATBALLS/OBJECTS
-         */
+        g.setColor(new Color(0,0,0));
+        g.fillOval(95, 300, 75, 75);
+        g.setColor(new Color(50,50,50));
+        g.fillOval(95+75/4, 300+75/4, 75/2, 75/2);
+
+        g.setColor(new Color(255, 255, 255));
+        g.fillOval(600, 300, 75, 75);
+        g.setColor(new Color(200, 200, 200));
+        g.fillOval(600+75/4, 300+75/4, 75/2, 75/2);
     }
 
     @Override
@@ -279,17 +285,29 @@ class Meatball {
 
     // Draw a meatball
     public void draw(Graphics g) {
-        if (randType == 1) 
+        if (randType == 0) 
             g.setColor(new Color(51, 204, 0)); // Green
-        else if (randType == 2 || randType == 3) {
+        else if (randType == 1 || randType == 2) {
             g.setColor(new Color(204, 51, 0)); // Red
+        }
+        else if (randType == 3){
+            g.setColor(new Color(0,0,0));
+        }
+        else if (randType == 4){
+            g.setColor(new Color(255, 255, 255));
         }
         g.fillOval(x, y, diameter, diameter);
 
-        if (randType == 1) 
+        if (randType == 0) 
             g.setColor(new Color(0, 102, 0)); // Dark green
-        else if (randType == 2 || randType == 3){
+        else if (randType == 1 || randType == 2){
             g.setColor(new Color(153, 0, 0)); // Dark red
+        }
+        else if (randType == 3){
+            g.setColor(new Color(50,50,50));
+        }
+        else if (randType == 4){
+            g.setColor(new Color(200, 200, 200));
         }
         g.fillOval(x+diameter/4, y+diameter/4, diameter/2, diameter/2);
     }
@@ -305,11 +323,17 @@ class Meatball {
     }
 
     public int isPoison() {
-        if (randType == 1){
+        if (randType == 0){
             return -1;
         }
-        else if (randType == 2 || randType == 3){
+        else if (randType == 1 || randType == 2){
             return 1;
+        }
+        else if (randType == 3){
+            return 2;
+        }
+        else if (randType == 4){
+            return 3;
         }
         //if it somehow doesnt hit any of the if statements
         return 1;
@@ -381,15 +405,46 @@ class TopScores {
 }
 
 class DieState extends GameState {
+
+    GamePlayState gamePlayState = new GamePlayState();
+
     @Override 
     // Draw the gameplay, updating several game components along the way
     public void draw(Graphics g, GamePanel panel) {
-    
+        gamePlayState.ended = true;
+        g.setFont(new Font("Arial", Font.BOLD, 130));
+        g.setColor(Color.BLACK);
+        g.drawString("YOU", 265, 200);
+        g.drawString("DIED", 245, 350);
+
+        // Ben pls make good score display w/ top5 scores using TopScores.getScores();
+        g.drawRect(350, 390, 100, 40);
+        g.setFont(new Font("Arial", Font.BOLD, 24));
+        g.drawString("Menu", 368, 420);
     }
     // Unused
     @Override
     public void handleClick(MouseEvent e, GamePanel panel) {
-    
+        int mouseX = e.getX();
+        int mouseY = e.getY();
+
+        int backToMenuButtonX = 350;
+        int backToMenuButtonY = 390;
+
+        int buttonWidth = 100;
+        int buttonHeight = 40;
+
+        if (mouseX >= backToMenuButtonX && mouseX <= backToMenuButtonX + buttonWidth && mouseY >= backToMenuButtonY && mouseY <= backToMenuButtonY + buttonHeight) {
+            panel.setGameState(new MainMenuState());
+        }
+    }
+
+    @Override
+    // Controls to move the character left and right across the screen or enter the pause menu with p
+    public void handleKeyPress(int keyCode, GamePanel panel) {
+        if (keyCode == KeyEvent.VK_R && gamePlayState.ended) {
+            panel.setGameState(new MainMenuState());
+        }
     }
 }
 
@@ -398,11 +453,12 @@ class GamePlayState extends GameState {
 
     // Character attributes
     TopScores topScores = new TopScores();
-    private boolean ended;
+    public boolean ended;
     private boolean scoreEnded;
     private double bubbleCounterA = 36, bubbleCounterB = 35, bubbleCounterC = 35;
     private int raftChange, raftChangeCounter, sinkSpeed = 1, maxSink = 520; // make this 0 and have win clause change it to 520  
-    private int spriteX = 350, spriteY = 455, moveSpeed = 10;; 
+    private int spriteX = 350, spriteY = 455;'
+    public static int moveSpeed = 10;
     private final int spriteWidth = 50, spriteHeight = 50;
     private int counter = 0;
     
@@ -431,14 +487,17 @@ class GamePlayState extends GameState {
     }
 
     // Method to update variable to keep track of how many frames it has been since character has eaten
-    public static void eats(int type) {
+    public static void eats(int type, GamePanel panel) {
         if (type == 1)
             hasEaten = 10;
         else if (type == -1){
             hasBarfed = 10;
         }
         else if (type == 2){
-            
+            panel.setGameState(new DieState());
+        }
+        else if (type == 3){
+            moveSpeed += 1;
         }
     }
 
@@ -706,7 +765,7 @@ class GamePlayState extends GameState {
                 if (score<0)
                     score = 0;
                 // Variable shows the character has eaten (will display message next 10 frames)
-                GamePlayState.eats(meatball.isPoison());
+                GamePlayState.eats(meatball.isPoison(), panel);
             }
         }
     }
