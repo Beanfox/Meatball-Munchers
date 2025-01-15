@@ -132,13 +132,13 @@ class HighScoreState extends GameState{
         g.setFont(new Font("Arial", Font.BOLD, 24));
         g.drawRect(348, 225, 100, 170);
         g.drawString("1 - " + topScores.getScores().get(0), 368, 260);
-        g.drawString("2 - " + topScores.getScores().get(1), 368,  290);
+        g.drawString("2 - " + topScores.getScores().get(1), 368, 290);
         g.drawString("3 - " + topScores.getScores().get(2), 368, 320);
         g.drawString("4 - " + topScores.getScores().get(3), 368, 350);
         g.drawString("5 - " + topScores.getScores().get(4), 368, 380);
 
         g.setFont(new Font("Arial", Font.PLAIN, 24));
-        g.drawRect(348, 410, 100, 50);
+        g.drawRect(350, 410, 100, 50);
         g.drawString("Menu", 368, 445);
     }
 
@@ -148,7 +148,7 @@ class HighScoreState extends GameState{
         int mouseX = e.getX();
         int mouseY = e.getY();
 
-        int backToMenuButtonX = 368;
+        int backToMenuButtonX = 350;
         int backToMenuButtonY = 410;
 
         int buttonWidth = 100;
@@ -189,7 +189,7 @@ class HowToPlayState extends GameState{
         g.drawString("movement speed up", 520, 450);
 
         g.setFont(new Font("Arial", Font.PLAIN, 24));
-        g.drawRect(348, 250, 100, 50);
+        g.drawRect(350, 250, 100, 50);
         g.drawString("Menu", 368, 285);
 
         g.setColor(new Color(51, 204, 0)); // Green
@@ -330,7 +330,7 @@ class TopScores {
     private ArrayList<Integer> scores = new ArrayList<>();
     // Score list contructor, reads the scores on file
     public TopScores() {
-        try (BufferedReader scoreReader = new BufferedReader(new FileReader("MeatballMunchers\\src\\ScoreRecord.txt"))) {
+        try (BufferedReader scoreReader = new BufferedReader(new FileReader("/Users/kylesaric/Desktop/SortingArrays/src/scoreRecord.txt"))) {
             String line;
             while ((line = scoreReader.readLine()) != null) {
                 try {
@@ -367,7 +367,7 @@ class TopScores {
     // Method to save the latest scores on file
     private void saveScores() {
         try {
-            File record = new File("MeatballMunchers\\src\\ScoreRecord.txt");
+            File record = new File("/Users/kylesaric/Desktop/SortingArrays/src/scoreRecord.txt");
             FileWriter scoreWriter = new FileWriter(record);
             for (int score : scores) {
                 scoreWriter.write("\n" + score);
@@ -383,7 +383,7 @@ class TopScores {
         return scores;
     }
 }
-
+/* 
 class DieState extends GameState {
     @Override 
     // Draw the gameplay, updating several game components along the way
@@ -395,7 +395,7 @@ class DieState extends GameState {
     public void handleClick(MouseEvent e, GamePanel panel) {
     
     }
-}
+}*/
 
 // Concrete class for game play
 class GamePlayState extends GameState {
@@ -622,9 +622,21 @@ class GamePlayState extends GameState {
     
     }
 
-    // Unused
     @Override
-    public void handleClick(MouseEvent e, GamePanel panel) {}
+    public void handleClick(MouseEvent e, GamePanel panel) {
+        int mouseX = e.getX();
+        int mouseY = e.getY();
+
+        int backToMenuButtonX = 350;
+        int backToMenuButtonY = 390;
+
+        int buttonWidth = 100;
+        int buttonHeight = 40;
+
+        if (mouseX >= backToMenuButtonX && mouseX <= backToMenuButtonX + buttonWidth && mouseY >= backToMenuButtonY && mouseY <= backToMenuButtonY + buttonHeight) {
+            panel.setGameState(new MainMenuState());
+        }
+    }
 
     @Override
     // Controls to move the character left and right across the screen or enter the pause menu with p
