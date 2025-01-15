@@ -125,6 +125,8 @@ class HighScoreState extends GameState{
         g.setColor(Color.BLACK);
         g.setFont(new Font("Arial", Font.BOLD, 36));
         g.drawString("Leaderboard", 290, 200);
+        g.setFont(new Font("Arial", Font.BOLD, 9));
+        g.drawString("Hint: you must achieve a leaderboard rank to survive", 286, 215);
 
         g.setColor(Color.BLACK);
         g.setFont(new Font("Arial", Font.BOLD, 24));
@@ -383,7 +385,7 @@ class TopScores {
     // Method to save the latest scores on file
     private void saveScores() {
         try {
-            File record = new File("src\\scoreRecord.txt");
+            File record = new File("/Users/kylesaric/Desktop/SortingArrays/src/scoreRecord.txt");
             FileWriter scoreWriter = new FileWriter(record);
             for (int score : scores) {
                 scoreWriter.write("\n" + score);
@@ -451,7 +453,7 @@ class GamePlayState extends GameState {
     public boolean ended;
     private boolean scoreEnded;
     private double bubbleCounterA = 36, bubbleCounterB = 35, bubbleCounterC = 35;
-    private int raftChange, raftChangeCounter, sinkSpeed = 100, maxSink = 520; // make this 0 and have win clause change it to 520  
+    private int raftChange, raftChangeCounter, sinkSpeed = 5, maxSink = 520; // make this 0 and have win clause change it to 520  
     private int spriteX = 350, spriteY = 455;
     public static int moveSpeed = 10;
     private final int spriteWidth = 50, spriteHeight = 50;
@@ -587,8 +589,9 @@ class GamePlayState extends GameState {
             scoreEnded = true;
             if (topScores.checkScore(score)) {
                 // Run helicopter scene
+                if (!ended)
+                    topScores.addScore(score);
                 ended = true;
-                topScores.addScore(score);
             } else {
                 sinkSpeed = 1;
                 maxSink = 600+spriteHeight;
@@ -612,8 +615,9 @@ class GamePlayState extends GameState {
                 }
 
                 if (spriteY == 600+spriteHeight) { 
+                    if (!ended)
+                        topScores.addScore(score);
                     ended = true;
-                    topScores.addScore(score);
                     g.setFont(new Font("Arial", Font.BOLD, 130));
                     g.setColor(Color.BLACK);
                     g.drawString("YOU", 265, 200);
