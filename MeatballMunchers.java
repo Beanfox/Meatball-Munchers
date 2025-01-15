@@ -14,8 +14,6 @@ import java.io.*;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.File;  
-import java.io.FileNotFoundException;  
-import java.util.Scanner;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -270,8 +268,7 @@ class Cloud {
 
 // Class for falling meatballs
 class Meatball {
-    private int x, y, diameter, speed;
-    private int randType;
+    private int x, y, diameter, speed, randType;
 
     // Meatball constructor
     public Meatball(int x, int diameter, int randType) {
@@ -279,7 +276,15 @@ class Meatball {
         this.y = 0;
         this.diameter = diameter;
         this.speed = 5;
-        this.randType = randType;
+        if (randType < 40)
+            this.randType = 1;
+        else if (randType < 80) {
+            this.randType = -1;
+        } else if (randType < 90) {
+            this.randType = 0;
+        } else if (randType < 100) {
+            this.randType = 2;
+        }
     }
     
     // Give a meatball its speed
@@ -289,29 +294,29 @@ class Meatball {
 
     // Draw a meatball
     public void draw(Graphics g) {
-        if (randType == 0) 
-            g.setColor(new Color(51, 204, 0)); // Green
-        else if (randType == 1 || randType == 2) {
-            g.setColor(new Color(204, 51, 0)); // Red
+        if (randType == -1) 
+            g.setColor(new Color(51, 204, 0)); // Green rotten meatball
+        else if (randType == 0) {
+            g.setColor(new Color(0,0,0)); // Black deadly meatball
         }
-        else if (randType == 3){
-            g.setColor(new Color(0,0,0));
+        else if (randType == 1){ 
+            g.setColor(new Color(204, 51, 0)); // Red fresh meatball
         }
-        else if (randType == 4){
-            g.setColor(new Color(255, 255, 255));
+        else if (randType == 2){
+            g.setColor(new Color(255, 255, 255)); // White speed meatball
         }
         g.fillOval(x, y, diameter, diameter);
 
-        if (randType == 0) 
+        if (randType == -1) 
             g.setColor(new Color(0, 102, 0)); // Dark green
-        else if (randType == 1 || randType == 2){
+        else if (randType == 0){
+            g.setColor(new Color(50,50,50)); // Gray
+        }
+        else if (randType == 1){
             g.setColor(new Color(153, 0, 0)); // Dark red
         }
-        else if (randType == 3){
-            g.setColor(new Color(50,50,50));
-        }
-        else if (randType == 4){
-            g.setColor(new Color(200, 200, 200));
+        else if (randType == 2){
+            g.setColor(new Color(200, 200, 200)); // White ish gray
         }
         g.fillOval(x+diameter/4, y+diameter/4, diameter/2, diameter/2);
     }
@@ -326,21 +331,8 @@ class Meatball {
         return diameter;
     }
 
-    public int isPoison() {
-        if (randType == 0){
-            return -1;
-        }
-        else if (randType == 1 || randType == 2){
-            return 1;
-        }
-        else if (randType == 3){
-            return 2;
-        }
-        else if (randType == 4){
-            return 3;
-        }
-        //if it somehow doesnt hit any of the if statements
-        return 1;
+    public int getMeatValue() {
+        return randType; // What type of meatball assigned to an int
     }
 
     // Check if the meatball has fallen past the floor
@@ -354,7 +346,7 @@ class TopScores {
     private ArrayList<Integer> scores = new ArrayList<>();
     // Score list contructor, reads the scores on file
     public TopScores() {
-        try (BufferedReader scoreReader = new BufferedReader(new FileReader("src\\scoreRecord.txt"))) {
+        try (BufferedReader scoreReader = new BufferedReader(new FileReader("/Users/kylesaric/Desktop/SortingArrays/src/scoreRecord.txt"))) {
             String line;
             while ((line = scoreReader.readLine()) != null) {
                 try {
@@ -415,16 +407,16 @@ class DieState extends GameState {
     @Override 
     // Draw the gameplay, updating several game components along the way
     public void draw(Graphics g, GamePanel panel) {
-        gamePlayState.ended = true;
+        //gamePlayState.ended = true; // Unnecessary i think
         g.setFont(new Font("Arial", Font.BOLD, 130));
         g.setColor(Color.BLACK);
         g.drawString("YOU", 265, 200);
         g.drawString("DIED", 245, 350);
 
-        // Ben pls make good score display w/ top5 scores using TopScores.getScores();
-        g.drawRect(350, 390, 100, 40);
         g.setFont(new Font("Arial", Font.BOLD, 24));
-        g.drawString("Menu", 368, 420);
+        g.drawString("Meatball Score: Invalid.", 268, 410 );
+        g.drawRect(350, 440, 100, 40);
+        g.drawString("Menu", 368, 470);
     }
     @Override
     public void handleClick(MouseEvent e, GamePanel panel) {
@@ -432,7 +424,7 @@ class DieState extends GameState {
         int mouseY = e.getY();
 
         int backToMenuButtonX = 350;
-        int backToMenuButtonY = 390;
+        int backToMenuButtonY = 440;
 
         int buttonWidth = 100;
         int buttonHeight = 40;
@@ -459,7 +451,7 @@ class GamePlayState extends GameState {
     public boolean ended;
     private boolean scoreEnded;
     private double bubbleCounterA = 36, bubbleCounterB = 35, bubbleCounterC = 35;
-    private int raftChange, raftChangeCounter, sinkSpeed = 1, maxSink = 520; // make this 0 and have win clause change it to 520  
+    private int raftChange, raftChangeCounter, sinkSpeed = 100, maxSink = 520; // make this 0 and have win clause change it to 520  
     private int spriteX = 350, spriteY = 455;
     public static int moveSpeed = 10;
     private final int spriteWidth = 50, spriteHeight = 50;
@@ -496,10 +488,10 @@ class GamePlayState extends GameState {
         else if (type == -1){
             hasBarfed = 10;
         }
-        else if (type == 2){
+        else if (type == 0){
             panel.setGameState(new DieState());
         }
-        else if (type == 3){
+        else if (type == 2){
             moveSpeed += 1;
         }
     }
@@ -597,8 +589,8 @@ class GamePlayState extends GameState {
                 // Run helicopter scene
                 ended = true;
                 topScores.addScore(score);
-                System.out.println("hi");
             } else {
+                sinkSpeed = 1;
                 maxSink = 600+spriteHeight;
 
                 // Bubble animation
@@ -627,10 +619,10 @@ class GamePlayState extends GameState {
                     g.drawString("YOU", 265, 200);
                     g.drawString("DROWNED", 55, 350);
 
-                    // Ben pls make good score display w/ top5 scores using TopScores.getScores();
-                    g.drawRect(350, 390, 100, 40);
                     g.setFont(new Font("Arial", Font.BOLD, 24));
-                    g.drawString("Menu", 368, 420);
+                    g.drawString("Meatball Score: " + score, 268, 410 );
+                    g.drawRect(350, 440, 100, 40);
+                    g.drawString("Menu", 368, 470);
                 }
             }
         }
@@ -662,7 +654,7 @@ class GamePlayState extends GameState {
         }
 
         // Draw the meatball counter in the top right hand corner
-        if (!ended) {
+        if (!scoreEnded) {
             g.setColor(Color.BLACK);
             g.setFont(new Font("Arial", Font.PLAIN, 18));
             g.drawString("Meatball Score: " + score, 630, 30);
@@ -688,7 +680,7 @@ class GamePlayState extends GameState {
         int mouseY = e.getY();
 
         int backToMenuButtonX = 350;
-        int backToMenuButtonY = 390;
+        int backToMenuButtonY = 440;
 
         int buttonWidth = 100;
         int buttonHeight = 40;
@@ -733,7 +725,7 @@ class GamePlayState extends GameState {
         // Randomly generate a meatball (1/25 chance every frame, 1 frame every 16 ms, avg 2.5 meatballs ever second)
         if (random.nextInt(25) == 0 && !ended) { 
             int x = random.nextInt(740);
-            meatballs.add(new Meatball(x, (30+random.nextInt(10)), random.nextInt(3)+1));
+            meatballs.add(new Meatball(x, (30+random.nextInt(10)), random.nextInt(100)));
         }
 
         // Randomly generate a cloud 
@@ -764,11 +756,11 @@ class GamePlayState extends GameState {
             else if (meatball.getBounds().intersects(new Rectangle(spriteX, spriteY-20 , (5+spriteWidth), (spriteHeight)))) {
                 iterator.remove();
                 if (!scoreEnded)
-                    score += meatball.isPoison()*Math.round(meatball.getDiam()/5);
+                    score += meatball.getMeatValue()*Math.round(meatball.getDiam()/5);
                 if (score<0)
                     score = 0;
                 // Variable shows the character has eaten (will display message next 10 frames)
-                GamePlayState.eats(meatball.isPoison(), panel);
+                GamePlayState.eats(meatball.getMeatValue(), panel);
             }
         }
     }
