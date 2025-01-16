@@ -729,7 +729,7 @@ class GamePlayState extends GameState {
             moveRight = true;
         } else if (keyCode == KeyEvent.VK_P && !ended) {
             panel.setGameState(new PauseMenuState(this));
-        } else if (keyCode == KeyEvent.VK_R && ended) {
+        } else if (keyCode == KeyEvent.VK_R && !ended) {
             panel.setGameState(new MainMenuState());
         }
     }
