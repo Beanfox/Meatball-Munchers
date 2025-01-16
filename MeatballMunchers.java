@@ -179,7 +179,7 @@ class HowToPlayState extends GameState{
 
         g.setColor(Color.BLACK);
         g.setFont(new Font("Arial", Font.BOLD, 24));
-        g.drawString("Spiked Meatball", 50, 430);
+        g.drawString("Bomb Meatball", 50, 430);
         g.setFont(new Font("Arial", Font.PLAIN, 24));
         g.drawString("kills player", 80, 480);
 
@@ -192,21 +192,34 @@ class HowToPlayState extends GameState{
         g.drawRect(350, 250, 100, 50);
         g.drawString("Menu", 368, 285);
         
+        // Rotten meatball
         g.setColor(new Color(51, 204, 0)); // Green
         g.fillOval(600, 135, 75, 75);
         g.setColor(new Color(0, 102, 0)); // Dark green
         g.fillOval(600 + 75 / 4, 135 + 75 / 4, 75 / 2, 75 / 2);
 
+        // Fresh meatball
         g.setColor(new Color(204, 51, 0)); // Red
         g.fillOval(95, 135, 75, 75);
         g.setColor(new Color(153, 0, 0)); // Dark red
         g.fillOval(95 + 75 / 4, 135 + 75 / 4, 75 / 2, 75 / 2);
 
-        g.setColor(new Color(0,0,0));
-        g.fillOval(95, 300, 75, 75);
-        g.setColor(new Color(50,50,50));
-        g.fillOval(95+75/4, 300+75/4, 75/2, 75/2);
+        // Bomb meatball
+        int x = 95, y = 300, diameter = 75;
+        // Draw the fuse
+        g.setColor(new Color(125, 97, 56));
+        g.drawArc(x+(int)Math.round(diameter/2)-2, y-18, 50, 90, 90, 60); 
+        // Draw the spark/fire
+        g.setColor(Color.RED);
+        g.fillOval(x+(int)Math.round(diameter/2)+17, y-23, 8, 8); // Spark/fire at the end of the fuse
+        g.setColor(Color.YELLOW);
+        g.fillOval(x+(int)Math.round(diameter/2)+18, y-23, 6, 6); 
+        g.setColor(Color.BLACK);
+        // Bomb part
+        g.setColor(Color.BLACK);
+        g.fillOval(x, y, diameter, diameter);
 
+        // Speed meatball
         g.setColor(new Color(255, 255, 255));
         g.fillOval(600, 300, 75, 75);
         g.setColor(new Color(200, 200, 200));
@@ -299,7 +312,7 @@ class Meatball {
         if (randType == -1) 
             g.setColor(new Color(51, 204, 0)); // Green rotten meatball
         else if (randType == 0) {
-            g.setColor(new Color(0,0,0)); // Black deadly meatball
+            g.setColor(Color.BLACK); // Black deadly meatball
         }
         else if (randType == 1){ 
             g.setColor(new Color(204, 51, 0)); // Red fresh meatball
@@ -311,8 +324,21 @@ class Meatball {
 
         if (randType == -1) 
             g.setColor(new Color(0, 102, 0)); // Dark green
-        else if (randType == 0){
-            g.setColor(new Color(50,50,50)); // Gray
+        else if (randType == 0){ 
+            // Draw the bomb
+            g.setColor(Color.BLACK);
+            g.fillOval(x, y, diameter, diameter);
+            
+            // Draw the fuse
+            g.setColor(new Color(125, 97, 56));
+            g.drawArc(x+(int)Math.round(diameter/2)-2, y-10, 30, 50, 90, 60); 
+
+            // Draw the spark/fire
+            g.setColor(Color.RED);
+            g.fillOval(x+(int)Math.round(diameter/2)+5, y-12, 8, 8); // Spark/fire at the end of the fuse
+            g.setColor(Color.YELLOW);
+            g.fillOval(x+(int)Math.round(diameter/2)+6, y -12, 6, 6); 
+            g.setColor(Color.BLACK);
         }
         else if (randType == 1){
             g.setColor(new Color(153, 0, 0)); // Dark red
@@ -452,8 +478,8 @@ class GamePlayState extends GameState {
     TopScores topScores = new TopScores();
     public boolean ended;
     private boolean scoreEnded;
-    private double bubbleCounterA = 36, bubbleCounterB = 35, bubbleCounterC = 35;
-    private int raftChange, raftChangeCounter, sinkSpeed = 5, maxSink = 520; // make this 0 and have win clause change it to 520  
+    private double bubbleCounterA = 36, buxbbleCounterB = 35, bubbleCounterC = 35;
+    private int raftChange, raftChangeCounter, sinkSpeed = 25, maxSink = 520; // make this 0 and have win clause change it to 520  
     private int spriteX = 350, spriteY = 455;
     public static int moveSpeed = 10;
     private final int spriteWidth = 50, spriteHeight = 50;
@@ -624,7 +650,7 @@ class GamePlayState extends GameState {
                     g.drawString("DROWNED", 55, 350);
 
                     g.setFont(new Font("Arial", Font.BOLD, 24));
-                    g.drawString("Meatball Score: " + score, 268, 410 );
+                    g.drawString("Meatball Score: " + score, 300, 410 );
                     g.drawRect(350, 440, 100, 40);
                     g.drawString("Menu", 368, 470);
                 }
