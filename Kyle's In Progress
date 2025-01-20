@@ -1,4 +1,3 @@
-
 /* 
 Program Name: MeatballMunchers.java
 Names: Kyle Saric & Ben Brake
@@ -99,8 +98,9 @@ class MainMenuState extends GameState {
         int buttonWidth = 100;
         int buttonHeight = 50;
 
+        // Button logic for each menu button
         if (mouseX >= startButtonX && mouseX <= startButtonX + buttonWidth && mouseY >= startButtonY && mouseY <= startButtonY + buttonHeight) {
-            panel.setGameState(new GamePlayState());
+            panel.setGameState(new GamePlayState()); // Calls a new state for the screen, in this case the game state
         }
         if (mouseX >= howToPlayButtonX && mouseX <= howToPlayButtonX + howToPlayButtonWidth && mouseY >= howToPlayButtonY && mouseY <= howToPlayButtonY + buttonHeight) {
             panel.setGameState(new HowToPlayState());
@@ -117,11 +117,12 @@ class MainMenuState extends GameState {
     public void handleKeyPress(int keyCode, GamePanel panel) {}
 }
 
+// Concrete class for high score menu
 class HighScoreState extends GameState{
     TopScores topScores = new TopScores();
 
-    @Override
-    public void draw(Graphics g, GamePanel panel) {
+    @Override 
+    public void draw(Graphics g, GamePanel panel) { // Leaderboard visuals
         g.setColor(Color.BLACK);
         g.setFont(new Font("Arial", Font.BOLD, 36));
         g.drawString("Leaderboard", 290, 200);
@@ -145,8 +146,8 @@ class HighScoreState extends GameState{
     @Override
     // Start the game if the user clicks the start button
     public void handleClick(MouseEvent e, GamePanel panel) {
-        int mouseX = e.getX();
-        int mouseY = e.getY();
+        int mouseX = e.getX(); // Get the mouses X position
+        int mouseY = e.getY(); // Get the mouses Y position
 
         int backToMenuButtonX = 350;
         int backToMenuButtonY = 410;
@@ -154,6 +155,7 @@ class HighScoreState extends GameState{
         int buttonWidth = 100;
         int buttonHeight = 50;
 
+        // Button logic for the back to menu button
         if (mouseX >= backToMenuButtonX && mouseX <= backToMenuButtonX + buttonWidth && mouseY >= backToMenuButtonY && mouseY <= backToMenuButtonY + buttonHeight) {
             panel.setGameState(new MainMenuState());
         }
@@ -163,6 +165,7 @@ class HighScoreState extends GameState{
     public void handleKeyPress(int keyCode, GamePanel panel) {}
 }
 
+// Concrete class for the how to play menu
 class HowToPlayState extends GameState{
     @Override
     public void draw(Graphics g, GamePanel panel) {
@@ -187,6 +190,12 @@ class HowToPlayState extends GameState{
         g.drawString("Speed Meatball", 540, 430);
         g.setFont(new Font("Arial", Font.PLAIN, 24));
         g.drawString("movement speed up", 520, 480);
+
+        g.setFont(new Font("Arial", Font.PLAIN, 24));
+        g.drawString("left and right arrow keys to move", 225, 545);
+
+        g.setFont(new Font("Arial", Font.PLAIN, 24));
+        g.drawString("P to pause", 340, 500);
 
         g.setFont(new Font("Arial", Font.PLAIN, 24));
         g.drawRect(350, 250, 100, 50);
@@ -374,7 +383,7 @@ class TopScores {
     private ArrayList<Integer> scores = new ArrayList<>();
     // Score list contructor, reads the scores on file
     public TopScores() {
-        try (BufferedReader scoreReader = new BufferedReader(new FileReader("/Users/kylesaric/Desktop/SortingArrays/src/scoreRecord.txt"))) {
+        try (BufferedReader scoreReader = new BufferedReader(new FileReader("src/scoreRecord.txt"))) { // High score text file path
             String line;
             while ((line = scoreReader.readLine()) != null) {
                 try {
@@ -411,7 +420,7 @@ class TopScores {
     // Method to save the latest scores on file
     private void saveScores() {
         try {
-            File record = new File("/Users/kylesaric/Desktop/SortingArrays/src/scoreRecord.txt");
+            File record = new File("/src/scoreRecord.txt"); // High score text file path
             FileWriter scoreWriter = new FileWriter(record);
             for (int score : scores) {
                 scoreWriter.write("\n" + score);
@@ -423,11 +432,12 @@ class TopScores {
         }
         
     }
-    public ArrayList<Integer> getScores() {
+    public ArrayList<Integer> getScores() { // ArrayList to store all current high scores
         return scores;
     }
 }
 
+// Concrete class for when the player dies
 class DieState extends GameState {
 
     GamePlayState gamePlayState = new GamePlayState();
@@ -510,17 +520,17 @@ class GamePlayState extends GameState {
         counter = 100;
     }
 
-    // Method to update variable to keep track of how many frames it has been since character has eaten
+    // Method to check which type of meatball the player has eaten and does its indended effect on the game
     public static void eats(int type, GamePanel panel) {
-        if (type == 1)
+        if (type == 1) // Red meatball
             hasEaten = 10;
-        else if (type == -1){
+        else if (type == -1){ // Green meatball
             hasBarfed = 10;
         }
-        else if (type == 0){
+        else if (type == 0){ // Bomb meatball 
             panel.setGameState(new DieState());
         }
-        else if (type == 2){
+        else if (type == 2){ // Speed meatball
             moveSpeed++;
             hasEatenSpeed = 10;
         }
@@ -642,15 +652,6 @@ class GamePlayState extends GameState {
 
                     spriteY-=3;
                     heliY-=3;
-
-                    
-                    /*while (true) {
-                    heliX++;
-                    heliY--;
-                    spriteX = heliX-75;
-                    spriteY = heliY+extendedRopeLength;
-                    }*/
-                    // fly away
                 } 
 
             } else if ((heliX - spriteX-75) > 200) {
@@ -849,7 +850,6 @@ class GamePlayState extends GameState {
     
     }
 
-    // Unused
     @Override
     public void handleClick(MouseEvent e, GamePanel panel) {
         int mouseX = e.getX();
