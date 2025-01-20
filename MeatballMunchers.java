@@ -380,7 +380,7 @@ class TopScores {
     private ArrayList<Integer> scores = new ArrayList<>();
     // Score list contructor, reads the scores on file
     public TopScores() {
-        try (BufferedReader scoreReader = new BufferedReader(new FileReader("/Users/kylesaric/Desktop/SortingArrays/src/scoreRecord.txt"))) {
+        try (BufferedReader scoreReader = new BufferedReader(new FileReader("src/scoreRecord.txt"))) {
             String line;
             while ((line = scoreReader.readLine()) != null) {
                 try {
@@ -409,7 +409,7 @@ class TopScores {
 
     // Method to check if the score is a record (if its a top 5 score)
     public boolean checkScore(int score) {
-        if (scores.size() < 5 || score > scores.get(scores.size()-1)) {
+        if (scores.size() <= 5 || score > scores.get(scores.size()-1)) {
             return true;
         }
         return false;
@@ -417,7 +417,7 @@ class TopScores {
     // Method to save the latest scores on file
     private void saveScores() {
         try {
-            File record = new File("/Users/kylesaric/Desktop/SortingArrays/src/scoreRecord.txt");
+            File record = new File("src/scoreRecord.txt");
             FileWriter scoreWriter = new FileWriter(record);
             for (int score : scores) {
                 scoreWriter.write("\n" + score);
@@ -901,7 +901,7 @@ class GamePlayState extends GameState {
             spriteX = Math.min(spriteX+moveSpeed, 775-spriteWidth);
 
         // Randomly generate a meatball (1/25 chance every frame, 1 frame every 16 ms, avg 2.5 meatballs ever second)
-        if (random.nextInt(25) == 0 && !hasEnded) { 
+        if (random.nextInt(15) == 0 && !hasEnded) { 
             int x = random.nextInt(740);
             meatballs.add(new Meatball(x, (30+random.nextInt(10)), random.nextInt(100)));
         }
