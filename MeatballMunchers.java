@@ -124,18 +124,18 @@ class HighScoreState extends GameState{
     public void draw(Graphics g, GamePanel panel) {
         g.setColor(Color.BLACK);
         g.setFont(new Font("Arial", Font.BOLD, 36));
-        g.drawString("Leaderboard", 290, 200);
+        g.drawString("Leaderboard", 292, 200);
         g.setFont(new Font("Arial", Font.BOLD, 9));
-        g.drawString("Hint: you must achieve a leaderboard rank to survive", 286, 215);
+        g.drawString("Hint: you must achieve a leaderboard rank to survive", 288, 215);
 
         g.setColor(Color.BLACK);
         g.setFont(new Font("Arial", Font.BOLD, 24));
-        g.drawRect(348, 225, 100, 170);
-        g.drawString("1 - " + topScores.getScores().get(0), 368, 260);
-        g.drawString("2 - " + topScores.getScores().get(1), 368,  290);
-        g.drawString("3 - " + topScores.getScores().get(2), 368, 320);
-        g.drawString("4 - " + topScores.getScores().get(3), 368, 350);
-        g.drawString("5 - " + topScores.getScores().get(4), 368, 380);
+        g.drawRect(350, 225, 100, 170);
+        g.drawString("1 - " + topScores.getScores().get(0), 362, 260);
+        g.drawString("2 - " + topScores.getScores().get(1), 362,  290);
+        g.drawString("3 - " + topScores.getScores().get(2), 362, 320);
+        g.drawString("4 - " + topScores.getScores().get(3), 362, 350);
+        g.drawString("5 - " + topScores.getScores().get(4), 362, 380);
 
         g.setFont(new Font("Arial", Font.PLAIN, 24));
         g.drawRect(350, 410, 100, 50);
@@ -207,7 +207,7 @@ class HowToPlayState extends GameState{
         // Bomb meatball
         int x = 95, y = 300, diameter = 75;
         // Draw the fuse
-        g.setColor(new Color(125, 97, 56));
+        g.setColor(new Color(125, 97, 56)); // Brown
         g.drawArc(x+(int)Math.round(diameter/2)-2, y-18, 50, 90, 90, 60); 
         // Draw the spark/fire
         g.setColor(Color.RED);
@@ -330,7 +330,7 @@ class Meatball {
             g.fillOval(x, y, diameter, diameter);
             
             // Draw the fuse
-            g.setColor(new Color(125, 97, 56));
+            g.setColor(new Color(125, 97, 56)); // Brown
             g.drawArc(x+(int)Math.round(diameter/2)-2, y-10, 30, 50, 90, 60); 
 
             // Draw the spark/fire
@@ -465,7 +465,7 @@ class DieState extends GameState {
     @Override
     // Controls to move the character left and right across the screen or enter the pause menu with p
     public void handleKeyPress(int keyCode, GamePanel panel) {
-        if (keyCode == KeyEvent.VK_R && gamePlayState.ended) {
+        if (keyCode == KeyEvent.VK_R && gamePlayState.hasEnded) {
             panel.setGameState(new MainMenuState());
         }
     }
@@ -476,16 +476,16 @@ class GamePlayState extends GameState {
 
     // Character attributes
     TopScores topScores = new TopScores();
-    public boolean ended;
-    private boolean scoreEnded;
+    public boolean hasEnded;
+    private boolean scoreEnded, hasFullyEnded;
     private double bubbleCounterA = 36, bubbleCounterB = 35, bubbleCounterC = 35;
     private int raftChange, raftChangeCounter, sinkSpeed = 25, maxSink = 520; // make this 0 and have win clause change it to 520  
     private int spriteX = 350, spriteY = 455;
     public static int moveSpeed = 10;
     private final int spriteWidth = 50, spriteHeight = 50;
     private int counter = 0;
-    
-    private static int hasEaten, hasBarfed;
+    private int heliX = 1000, heliY = 50, ropeLength = 1, extendedRopeLength = 300;
+    private static int hasEaten, hasBarfed, hasEatenSpeed;
 
     // Direction values
     private boolean moveLeft = false;
@@ -520,14 +520,14 @@ class GamePlayState extends GameState {
             panel.setGameState(new DieState());
         }
         else if (type == 2){
-            moveSpeed += 1;
+            moveSpeed++;
+            hasEatenSpeed = 10;
         }
     }
 
     @Override 
     // Draw the gameplay, updating several game components along the way
     public void draw(Graphics g, GamePanel panel) {
-
         // Water
         g.setColor(Color.BLUE);
         g.fillRect(0, 550, 800, 50);
@@ -580,7 +580,8 @@ class GamePlayState extends GameState {
         g.fillOval(731, 555+raftChange, 15, 15);
 
         // Draw the character
-        spriteY = Math.min(455+raftChange, maxSink);
+        if (ropeLength != extendedRopeLength+20) 
+            spriteY = Math.min(455+raftChange, maxSink);
         g.setColor(Color.BLACK); 
         g.fillOval(spriteX-2, spriteY-2, spriteWidth+4, spriteHeight+4); // Body
         g.setColor(Color.BLUE); 
@@ -611,13 +612,146 @@ class GamePlayState extends GameState {
         }
 
         // If the character is about to sink, check whether they are to be saved or not
-        if (spriteY >= 520) {
+        if (spriteY >= 520 || ropeLength == extendedRopeLength+20) {
             scoreEnded = true;
+            
             if (topScores.checkScore(score)) {
-                // Run helicopter scene
-                if (!ended)
+                
+            // If rope is to be extended, extend it
+            if (ropeLength > 0) {
+                g.setColor(new Color(125, 97, 56)); // Brown
+                g.fillRect(heliX-50, heliY-60, 8, ropeLength); // Rope
+                // If the character hasn't swallowed the rope, draw the rope knot
+                if (ropeLength != extendedRopeLength+20) {
+                    g.fillOval(heliX-61, heliY-65+ropeLength, 30, 30); // Rope knot
+                    g.setColor(new Color(75, 47, 6)); // Dark brown
+                    g.fillOval(heliX-54, heliY-58+ropeLength, 15, 15); // Rope knot
+                }
+                if (ropeLength > 0 && ropeLength < extendedRopeLength) 
+                    ropeLength++;
+            }
+
+            // Move the heli into position
+            if (heliY != 240 && ropeLength != extendedRopeLength+20) 
+                heliY++;
+            if (heliX == spriteX+75) {
+                if (ropeLength >= extendedRopeLength) {
+                    ropeLength = extendedRopeLength+20;
+                    spriteY -= 3;
+                    heliY -= 3;
+                    if (heliY < 0) {
+                        g.setFont(new Font("Arial", Font.BOLD, 130));
+                        g.setColor(Color.BLACK);
+                        g.drawString("YOU WERE", 50, 200);
+                        g.drawString("SAVED", 175, 350);
+
+                        g.setFont(new Font("Arial", Font.BOLD, 24));
+                        g.drawString("Meatball Score: " + score, 300, 410 );
+                        g.drawRect(350, 440, 100, 40);
+                        g.drawString("Menu", 368, 470);
+                        hasFullyEnded = true;
+                    }
+                } 
+
+            } else if ((heliX - spriteX-75) > 200) {
+                heliX -= 3;
+            } else if ((heliX - spriteX-75) > 0) {
+                heliX--;
+            } else if ((heliX - spriteX-75) < -100) {
+                heliX += 3;
+            } else if ((heliX - spriteX-75) < 0) {
+                heliX++;
+            }   
+            
+                // Cast to Graphics2D for better control
+                Graphics2D g2d = (Graphics2D) g;
+                // Smooth edges
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+                // Tail arm
+                g2d.setColor(Color.RED);
+                g2d.fillRect(heliX + 30, heliY, 80, 20);
+                g2d.setColor(Color.BLACK);
+                g2d.setStroke(new BasicStroke(2)); // Set line thickness
+                g2d.drawRect(heliX + 30, heliY, 80, 20);
+
+                // Rotor arm
+                g2d.setColor(Color.RED);
+                g2d.fillRect(heliX - 55, heliY - 57, 20, 30); // Center rotor circle
+                g2d.setColor(Color.BLACK);
+                g2d.setStroke(new BasicStroke(2)); // Set line thickness
+                g2d.drawRect(heliX - 55, heliY - 57, 20, 30); // Center rotor circle
+
+                // Skid connector
+                g2d.setColor(Color.BLACK);
+                g2d.setStroke(new BasicStroke(10)); // Set line thickness
+                g2d.drawArc(heliX - 25, heliY + 75, 20, 30, 0, 70);
+                g2d.setStroke(new BasicStroke(6)); // Set line thickness
+                g2d.setColor(Color.YELLOW);
+                g2d.drawArc(heliX - 25, heliY + 75, 20, 30, 0, 70);
+
+                // Skid connector
+                g2d.setColor(Color.BLACK);
+                g2d.setStroke(new BasicStroke(10)); // Set line thickness
+                g2d.drawArc(heliX - 85, heliY + 75, 20, 30, 110, 90); 
+                g2d.setStroke(new BasicStroke(6)); // Set line thickness
+                g2d.setColor(Color.YELLOW);
+                g2d.drawArc(heliX - 85, heliY + 75, 20, 30, 110, 90);
+
+                // Skid
+                g2d.setColor(Color.YELLOW);
+                g2d.fillRoundRect(heliX - 140, heliY + 90, 185, 10, 10, 10);
+                g2d.setStroke(new BasicStroke(2)); // Set line thickness
+                g2d.setColor(Color.BLACK);
+                g2d.drawRoundRect(heliX - 140, heliY + 90, 185, 10, 10, 10);
+
+                // Body of the helicopter
+                g2d.setColor(Color.RED);
+                g2d.fillOval(heliX - 150, heliY - 40, 200, 120); // Main body
+                g2d.setColor(Color.BLACK);
+                g2d.setStroke(new BasicStroke(2)); // Set line thickness
+                g2d.drawOval(heliX - 150, heliY - 40, 200, 120); // Main body outline
+
+                // Cockpit window
+                g2d.setColor(Color.CYAN);
+                g2d.fillOval(heliX - 150, heliY - 25, 100, 75); // Smaller window closer to the left
+                g2d.setColor(Color.BLACK);
+                g2d.setStroke(new BasicStroke(2));
+                g2d.drawOval(heliX - 150, heliY - 25, 100, 75); // Smaller window closer to the left
+
+                // Tail
+                g2d.setColor(new Color(200, 200, 200, 200)); // Transparent gray for spinning effect
+                g2d.fillOval(heliX + 90, heliY - 20, 60, 60); 
+                g2d.setColor(Color.BLACK);
+                g2d.setStroke(new BasicStroke(3)); // Set line thickness
+                g2d.drawOval(heliX + 90, heliY - 20, 60, 60); // Blade edge spinning
+                g2d.setColor(Color.RED);
+                g2d.fillOval(heliX + 105, heliY - 5, 30, 30); 
+                g2d.setColor(Color.BLACK);
+                g2d.drawOval(heliX + 105, heliY - 5, 30, 30);
+
+                // Rotor
+                g2d.setColor(new Color(200, 200, 200, 200)); // Transparent gray for spinning effect
+                g2d.fillOval(heliX - 185, heliY - 65, 280, 15); // Rotor blade 
+                g2d.setColor(Color.BLACK);
+                g2d.drawOval(heliX - 185, heliY - 65, 280, 15); // Rotor outline
+                g2d.setColor(Color.RED);
+                g2d.fillArc(heliX - 65, heliY - 61, 40, 12, 0, 180);
+                g2d.setColor(Color.BLACK);
+                g2d.setStroke(new BasicStroke(2)); // Set line thickness
+                g2d.drawArc(heliX - 65, heliY - 61, 40, 12, 5, 170); 
+
+                // Cross symbol for medic
+                g2d.setColor(Color.WHITE);
+                g2d.setStroke(new BasicStroke(2)); // Set line thickness
+                g2d.drawOval(heliX - 35, heliY - 20, 40, 40); // Logo circle
+                g2d.fillRect(heliX - 20, heliY - 14, 10, 28); // Vertical line
+                g2d.fillRect(heliX - 30, heliY - 5, 30, 10);  // Horizontal line
+
+                if (!hasEnded)
                     topScores.addScore(score);
-                ended = true;
+                hasEnded = true;
+
             } else {
                 sinkSpeed = 1;
                 maxSink = 600+spriteHeight;
@@ -641,9 +775,10 @@ class GamePlayState extends GameState {
                 }
 
                 if (spriteY == 600+spriteHeight) { 
-                    if (!ended)
+                    if (!hasEnded)
                         topScores.addScore(score);
-                    ended = true;
+                    hasEnded = true;
+                    hasFullyEnded = true;
                     g.setFont(new Font("Arial", Font.BOLD, 130));
                     g.setColor(Color.BLACK);
                     g.drawString("YOU", 265, 200);
@@ -656,7 +791,6 @@ class GamePlayState extends GameState {
                 }
             }
         }
-    
 
         // If the character has eaten within the last 10 frames, display an eating message
         if (hasEaten>0) {
@@ -673,6 +807,15 @@ class GamePlayState extends GameState {
             g.setFont(new Font("Arial", Font.BOLD, 18));
             g.drawString("bARf", spriteX+50, spriteY-30);
         }
+
+        // If the character has eaten a speed meatball within the last 10 frames, display a message
+        if (hasEatenSpeed>0) {
+            hasEatenSpeed--;
+            g.setColor(new Color(255, 255, 255)); // White ish
+            g.setFont(new Font("Arial", Font.PLAIN, 18));
+            g.drawString("snIFF", spriteX+50, spriteY-30);
+        }
+
 
         // Draw all the meatballs in using a method within the meatball class (to access their diameter specifications)
         for (Meatball meatball : meatballs) {
@@ -703,7 +846,6 @@ class GamePlayState extends GameState {
     
     }
 
-    // Unused
     @Override
     public void handleClick(MouseEvent e, GamePanel panel) {
         int mouseX = e.getX();
@@ -715,7 +857,7 @@ class GamePlayState extends GameState {
         int buttonWidth = 100;
         int buttonHeight = 40;
 
-        if (mouseX >= backToMenuButtonX && mouseX <= backToMenuButtonX + buttonWidth && mouseY >= backToMenuButtonY && mouseY <= backToMenuButtonY + buttonHeight) {
+        if (hasFullyEnded == true && mouseX >= backToMenuButtonX && mouseX <= backToMenuButtonX + buttonWidth && mouseY >= backToMenuButtonY && mouseY <= backToMenuButtonY + buttonHeight) {
             panel.setGameState(new MainMenuState());
         }
     }
@@ -727,9 +869,9 @@ class GamePlayState extends GameState {
             moveLeft = true;
         else if (keyCode == KeyEvent.VK_RIGHT) {
             moveRight = true;
-        } else if (keyCode == KeyEvent.VK_P && !ended) {
+        } else if (keyCode == KeyEvent.VK_P && !hasEnded) {
             panel.setGameState(new PauseMenuState(this));
-        } else if (keyCode == KeyEvent.VK_R && !ended) {
+        } else if (keyCode == KeyEvent.VK_R && !hasEnded) {
             panel.setGameState(new MainMenuState());
         }
     }
@@ -747,19 +889,19 @@ class GamePlayState extends GameState {
     public void update(GamePanel panel) {                                                                                     
 
         // Moves character left and right at their speed, within the bounds of the panel
-        if (moveLeft == true) 
+        if (moveLeft == true && ropeLength != extendedRopeLength+20) 
             spriteX = Math.max(spriteX-moveSpeed, 25);
-        if (moveRight == true) 
+        if (moveRight == true && ropeLength != extendedRopeLength+20) 
             spriteX = Math.min(spriteX+moveSpeed, 775-spriteWidth);
 
         // Randomly generate a meatball (1/25 chance every frame, 1 frame every 16 ms, avg 2.5 meatballs ever second)
-        if (random.nextInt(25) == 0 && !ended) { 
+        if (random.nextInt(25) == 0 && !hasEnded) { 
             int x = random.nextInt(740);
             meatballs.add(new Meatball(x, (30+random.nextInt(10)), random.nextInt(100)));
         }
 
         // Randomly generate a cloud 
-        if (random.nextInt(300) == 0 && !ended) { 
+        if (random.nextInt(300) == 0 && !hasEnded) { 
             int y = random.nextInt(200) + 25; 
             clouds.add(new Cloud(y, (40+random.nextInt(15))));
         }
