@@ -189,7 +189,7 @@ class HowToPlayState extends GameState{
         g.drawString("movement speed up", 520, 480);
 
         g.setFont(new Font("Arial", Font.PLAIN, 24));
-        g.drawString("left and right arrow keys to move", 225, 545);
+        g.drawString("Left and right arrow keys to move", 225, 545);
 
         g.setFont(new Font("Arial", Font.PLAIN, 24));
         g.drawString("P to pause", 340, 500);
