@@ -1,6 +1,6 @@
 
 /* 
-Program Name: MeatballMunchers.java
+Program Name: MeatballMunxchers.java
 Names: Kyle Saric & Ben Brake
 Date: 1/07/2024
 Purpose: Create an intuitive and polished game for users to eat as many meatballs as possible and have fun
@@ -380,7 +380,7 @@ class TopScores {
     private ArrayList<Integer> scores = new ArrayList<>();
     // Score list contructor, reads the scores on file
     public TopScores() {
-        try (BufferedReader scoreReader = new BufferedReader(new FileReader("src/scoreRecord.txt"))) {
+        try (BufferedReader scoreReader = new BufferedReader(new FileReader("/Users/kylesaric/Desktop/SortingArrays/src/scoreRecord.txt"))) {
             String line;
             while ((line = scoreReader.readLine()) != null) {
                 try {
@@ -409,7 +409,8 @@ class TopScores {
 
     // Method to check if the score is a record (if its a top 5 score)
     public boolean checkScore(int score) {
-        if (scores.size() <= 5 || score > scores.get(scores.size()-1)) {
+        if (scores.size() < 5 || score > scores.get(scores.size()-1)) {
+            addScore(score);
             return true;
         }
         return false;
@@ -417,7 +418,7 @@ class TopScores {
     // Method to save the latest scores on file
     private void saveScores() {
         try {
-            File record = new File("src/scoreRecord.txt");
+            File record = new File("/Users/kylesaric/Desktop/SortingArrays/src/scoreRecord.txt");
             FileWriter scoreWriter = new FileWriter(record);
             for (int score : scores) {
                 scoreWriter.write("\n" + score);
@@ -483,7 +484,7 @@ class GamePlayState extends GameState {
     // Character attributes
     TopScores topScores = new TopScores();
     public boolean hasEnded;
-    private boolean scoreEnded, hasFullyEnded;
+    private boolean scoreEnded, hasFullyEnded, isHighScore;
     private double bubbleCounterA = 36, bubbleCounterB = 35, bubbleCounterC = 35;
     private int raftChange, raftChangeCounter, sinkSpeed = 25, maxSink = 520; // make this 0 and have win clause change it to 520  
     private int spriteX = 350, spriteY = 455;
@@ -513,6 +514,7 @@ class GamePlayState extends GameState {
         clouds = new ArrayList<>();
         random = new Random();
         counter = 100;
+        moveSpeed = 10;
     }
 
     // Method to update variable to keep track of how many frames it has been since character has eaten
@@ -621,143 +623,143 @@ class GamePlayState extends GameState {
         if (spriteY >= 520 || ropeLength == extendedRopeLength+20) {
             scoreEnded = true;
             
-            if (topScores.checkScore(score)) {
-                
-            // If rope is to be extended, extend it
-            if (ropeLength > 0) {
-                g.setColor(new Color(125, 97, 56)); // Brown
-                g.fillRect(heliX-50, heliY-60, 8, ropeLength); // Rope
-                // If the character hasn't swallowed the rope, draw the rope knot
-                if (ropeLength != extendedRopeLength+20) {
-                    g.fillOval(heliX-61, heliY-65+ropeLength, 30, 30); // Rope knot
-                    g.setColor(new Color(75, 47, 6)); // Dark brown
-                    g.fillOval(heliX-54, heliY-58+ropeLength, 15, 15); // Rope knot
-                }
-                if (ropeLength > 0 && ropeLength < extendedRopeLength) 
-                    ropeLength++;
-            }
-
-            // Move the heli into position
-            if (heliY != 240 && ropeLength != extendedRopeLength+20) 
-                heliY++;
-            if (heliX == spriteX+75) {
-                if (ropeLength >= extendedRopeLength) {
-                    ropeLength = extendedRopeLength+20;
-                    spriteY -= 3;
-                    heliY -= 3;
-                    if (heliY < 0) {
-                        g.setFont(new Font("Arial", Font.BOLD, 130));
-                        g.setColor(Color.BLACK);
-                        g.drawString("YOU WERE", 50, 200);
-                        g.drawString("SAVED", 175, 350);
-
-                        g.setFont(new Font("Arial", Font.BOLD, 24));
-                        g.drawString("Meatball Score: " + score, 300, 410 );
-                        g.drawRect(350, 440, 100, 40);
-                        g.drawString("Menu", 368, 470);
-                        hasFullyEnded = true;
+            if (!isHighScore)
+                isHighScore = topScores.checkScore(score);
+            if (isHighScore) {
+                    
+                // If rope is to be extended, extend it
+                if (ropeLength > 0) {
+                    g.setColor(new Color(125, 97, 56)); // Brown
+                    g.fillRect(heliX-50, heliY-60, 8, ropeLength); // Rope
+                    // If the character hasn't swallowed the rope, draw the rope knot
+                    if (ropeLength != extendedRopeLength+20) {
+                        g.fillOval(heliX-61, heliY-65+ropeLength, 30, 30); // Rope knot
+                        g.setColor(new Color(75, 47, 6)); // Dark brown
+                        g.fillOval(heliX-54, heliY-58+ropeLength, 15, 15); // Rope knot
                     }
-                } 
+                    if (ropeLength > 0 && ropeLength < extendedRopeLength) 
+                        ropeLength++;
+                }
 
-            } else if ((heliX - spriteX-75) > 200) {
-                heliX -= 3;
-            } else if ((heliX - spriteX-75) > 0) {
-                heliX--;
-            } else if ((heliX - spriteX-75) < -100) {
-                heliX += 3;
-            } else if ((heliX - spriteX-75) < 0) {
-                heliX++;
-            }   
-            
-                // Cast to Graphics2D for better control
-                Graphics2D g2d = (Graphics2D) g;
-                // Smooth edges
-                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                // Move the heli into position
+                if (heliY != 240 && ropeLength != extendedRopeLength+20) 
+                    heliY++;
+                if (heliX == spriteX+75) {
+                    if (ropeLength >= extendedRopeLength) {
+                        ropeLength = extendedRopeLength+20;
+                        spriteY -= 3;
+                        heliY -= 3;
+                        if (heliY < 0) {
+                            g.setFont(new Font("Arial", Font.BOLD, 130));
+                            g.setColor(Color.BLACK);
+                            g.drawString("YOU WERE", 50, 200);
+                            g.drawString("SAVED", 175, 350);
 
-                // Tail arm
-                g2d.setColor(Color.RED);
-                g2d.fillRect(heliX + 30, heliY, 80, 20);
-                g2d.setColor(Color.BLACK);
-                g2d.setStroke(new BasicStroke(2)); // Set line thickness
-                g2d.drawRect(heliX + 30, heliY, 80, 20);
+                            g.setFont(new Font("Arial", Font.BOLD, 24));
+                            g.drawString("Meatball Score: " + score, 300, 410 );
+                            g.drawRect(350, 440, 100, 40);
+                            g.drawString("Menu", 368, 470);
 
-                // Rotor arm
-                g2d.setColor(Color.RED);
-                g2d.fillRect(heliX - 55, heliY - 57, 20, 30); // Center rotor circle
-                g2d.setColor(Color.BLACK);
-                g2d.setStroke(new BasicStroke(2)); // Set line thickness
-                g2d.drawRect(heliX - 55, heliY - 57, 20, 30); // Center rotor circle
+                            hasFullyEnded = true;
+                        }
+                    } 
 
-                // Skid connector
-                g2d.setColor(Color.BLACK);
-                g2d.setStroke(new BasicStroke(10)); // Set line thickness
-                g2d.drawArc(heliX - 25, heliY + 75, 20, 30, 0, 70);
-                g2d.setStroke(new BasicStroke(6)); // Set line thickness
-                g2d.setColor(Color.YELLOW);
-                g2d.drawArc(heliX - 25, heliY + 75, 20, 30, 0, 70);
+                } else if ((heliX - spriteX-75) > 200) {
+                    heliX -= 3;
+                } else if ((heliX - spriteX-75) > 0) {
+                    heliX--;
+                } else if ((heliX - spriteX-75) < -100) {
+                    heliX += 3;
+                } else if ((heliX - spriteX-75) < 0) {
+                    heliX++;
+                }   
+                
+                    // Cast to Graphics2D for better control
+                    Graphics2D g2d = (Graphics2D) g;
+                    // Smooth edges
+                    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-                // Skid connector
-                g2d.setColor(Color.BLACK);
-                g2d.setStroke(new BasicStroke(10)); // Set line thickness
-                g2d.drawArc(heliX - 85, heliY + 75, 20, 30, 110, 90); 
-                g2d.setStroke(new BasicStroke(6)); // Set line thickness
-                g2d.setColor(Color.YELLOW);
-                g2d.drawArc(heliX - 85, heliY + 75, 20, 30, 110, 90);
+                    // Tail arm
+                    g2d.setColor(Color.RED);
+                    g2d.fillRect(heliX + 30, heliY, 80, 20);
+                    g2d.setColor(Color.BLACK);
+                    g2d.setStroke(new BasicStroke(2)); // Set line thickness
+                    g2d.drawRect(heliX + 30, heliY, 80, 20);
 
-                // Skid
-                g2d.setColor(Color.YELLOW);
-                g2d.fillRoundRect(heliX - 140, heliY + 90, 185, 10, 10, 10);
-                g2d.setStroke(new BasicStroke(2)); // Set line thickness
-                g2d.setColor(Color.BLACK);
-                g2d.drawRoundRect(heliX - 140, heliY + 90, 185, 10, 10, 10);
+                    // Rotor arm
+                    g2d.setColor(Color.RED);
+                    g2d.fillRect(heliX - 55, heliY - 57, 20, 30); // Center rotor circle
+                    g2d.setColor(Color.BLACK);
+                    g2d.setStroke(new BasicStroke(2)); // Set line thickness
+                    g2d.drawRect(heliX - 55, heliY - 57, 20, 30); // Center rotor circle
 
-                // Body of the helicopter
-                g2d.setColor(Color.RED);
-                g2d.fillOval(heliX - 150, heliY - 40, 200, 120); // Main body
-                g2d.setColor(Color.BLACK);
-                g2d.setStroke(new BasicStroke(2)); // Set line thickness
-                g2d.drawOval(heliX - 150, heliY - 40, 200, 120); // Main body outline
+                    // Skid connector
+                    g2d.setColor(Color.BLACK);
+                    g2d.setStroke(new BasicStroke(10)); // Set line thickness
+                    g2d.drawArc(heliX - 25, heliY + 75, 20, 30, 0, 70);
+                    g2d.setStroke(new BasicStroke(6)); // Set line thickness
+                    g2d.setColor(Color.YELLOW);
+                    g2d.drawArc(heliX - 25, heliY + 75, 20, 30, 0, 70);
 
-                // Cockpit window
-                g2d.setColor(Color.CYAN);
-                g2d.fillOval(heliX - 150, heliY - 25, 100, 75); // Smaller window closer to the left
-                g2d.setColor(Color.BLACK);
-                g2d.setStroke(new BasicStroke(2));
-                g2d.drawOval(heliX - 150, heliY - 25, 100, 75); // Smaller window closer to the left
+                    // Skid connector
+                    g2d.setColor(Color.BLACK);
+                    g2d.setStroke(new BasicStroke(10)); // Set line thickness
+                    g2d.drawArc(heliX - 85, heliY + 75, 20, 30, 110, 90); 
+                    g2d.setStroke(new BasicStroke(6)); // Set line thickness
+                    g2d.setColor(Color.YELLOW);
+                    g2d.drawArc(heliX - 85, heliY + 75, 20, 30, 110, 90);
 
-                // Tail
-                g2d.setColor(new Color(200, 200, 200, 200)); // Transparent gray for spinning effect
-                g2d.fillOval(heliX + 90, heliY - 20, 60, 60); 
-                g2d.setColor(Color.BLACK);
-                g2d.setStroke(new BasicStroke(3)); // Set line thickness
-                g2d.drawOval(heliX + 90, heliY - 20, 60, 60); // Blade edge spinning
-                g2d.setColor(Color.RED);
-                g2d.fillOval(heliX + 105, heliY - 5, 30, 30); 
-                g2d.setColor(Color.BLACK);
-                g2d.drawOval(heliX + 105, heliY - 5, 30, 30);
+                    // Skid
+                    g2d.setColor(Color.YELLOW);
+                    g2d.fillRoundRect(heliX - 140, heliY + 90, 185, 10, 10, 10);
+                    g2d.setStroke(new BasicStroke(2)); // Set line thickness
+                    g2d.setColor(Color.BLACK);
+                    g2d.drawRoundRect(heliX - 140, heliY + 90, 185, 10, 10, 10);
 
-                // Rotor
-                g2d.setColor(new Color(200, 200, 200, 200)); // Transparent gray for spinning effect
-                g2d.fillOval(heliX - 185, heliY - 65, 280, 15); // Rotor blade 
-                g2d.setColor(Color.BLACK);
-                g2d.drawOval(heliX - 185, heliY - 65, 280, 15); // Rotor outline
-                g2d.setColor(Color.RED);
-                g2d.fillArc(heliX - 65, heliY - 61, 40, 12, 0, 180);
-                g2d.setColor(Color.BLACK);
-                g2d.setStroke(new BasicStroke(2)); // Set line thickness
-                g2d.drawArc(heliX - 65, heliY - 61, 40, 12, 5, 170); 
+                    // Body of the helicopter
+                    g2d.setColor(Color.RED);
+                    g2d.fillOval(heliX - 150, heliY - 40, 200, 120); // Main body
+                    g2d.setColor(Color.BLACK);
+                    g2d.setStroke(new BasicStroke(2)); // Set line thickness
+                    g2d.drawOval(heliX - 150, heliY - 40, 200, 120); // Main body outline
 
-                // Cross symbol for medic
-                g2d.setColor(Color.WHITE);
-                g2d.setStroke(new BasicStroke(2)); // Set line thickness
-                g2d.drawOval(heliX - 35, heliY - 20, 40, 40); // Logo circle
-                g2d.fillRect(heliX - 20, heliY - 14, 10, 28); // Vertical line
-                g2d.fillRect(heliX - 30, heliY - 5, 30, 10);  // Horizontal line
+                    // Cockpit window
+                    g2d.setColor(Color.CYAN);
+                    g2d.fillOval(heliX - 150, heliY - 25, 100, 75); // Smaller window closer to the left
+                    g2d.setColor(Color.BLACK);
+                    g2d.setStroke(new BasicStroke(2));
+                    g2d.drawOval(heliX - 150, heliY - 25, 100, 75); // Smaller window closer to the left
 
-                if (!hasEnded)
-                    topScores.addScore(score);
-                hasEnded = true;
+                    // Tail
+                    g2d.setColor(new Color(200, 200, 200, 200)); // Transparent gray for spinning effect
+                    g2d.fillOval(heliX + 90, heliY - 20, 60, 60); 
+                    g2d.setColor(Color.BLACK);
+                    g2d.setStroke(new BasicStroke(3)); // Set line thickness
+                    g2d.drawOval(heliX + 90, heliY - 20, 60, 60); // Blade edge spinning
+                    g2d.setColor(Color.RED);
+                    g2d.fillOval(heliX + 105, heliY - 5, 30, 30); 
+                    g2d.setColor(Color.BLACK);
+                    g2d.drawOval(heliX + 105, heliY - 5, 30, 30);
 
+                    // Rotor
+                    g2d.setColor(new Color(200, 200, 200, 200)); // Transparent gray for spinning effect
+                    g2d.fillOval(heliX - 185, heliY - 65, 280, 15); // Rotor blade 
+                    g2d.setColor(Color.BLACK);
+                    g2d.drawOval(heliX - 185, heliY - 65, 280, 15); // Rotor outline
+                    g2d.setColor(Color.RED);
+                    g2d.fillArc(heliX - 65, heliY - 61, 40, 12, 0, 180);
+                    g2d.setColor(Color.BLACK);
+                    g2d.setStroke(new BasicStroke(2)); // Set line thickness
+                    g2d.drawArc(heliX - 65, heliY - 61, 40, 12, 5, 170); 
+
+                    // Cross symbol for medic
+                    g2d.setColor(Color.WHITE);
+                    g2d.setStroke(new BasicStroke(2)); // Set line thickness
+                    g2d.drawOval(heliX - 35, heliY - 20, 40, 40); // Logo circle
+                    g2d.fillRect(heliX - 20, heliY - 14, 10, 28); // Vertical line
+                    g2d.fillRect(heliX - 30, heliY - 5, 30, 10);  // Horizontal line
+
+                    hasEnded = true;
             } else {
                 sinkSpeed = 1;
                 maxSink = 600+spriteHeight;
@@ -781,8 +783,6 @@ class GamePlayState extends GameState {
                 }
 
                 if (spriteY == 600+spriteHeight) { 
-                    if (!hasEnded)
-                        topScores.addScore(score);
                     hasEnded = true;
                     hasFullyEnded = true;
                     g.setFont(new Font("Arial", Font.BOLD, 130));
