@@ -306,6 +306,7 @@ class Meatball {
         } else if (randType < 100) {
             this.randType = 2;
         }
+ 
     }
     
     // Give a meatball its speed
@@ -486,9 +487,9 @@ class GamePlayState extends GameState {
     public boolean hasEnded;
     private boolean scoreEnded, hasFullyEnded, isHighScore;
     private double bubbleCounterA = 36, bubbleCounterB = 35, bubbleCounterC = 35;
-    private int raftChange, raftChangeCounter, sinkSpeed = 25, maxSink = 520; // make this 0 and have win clause change it to 520  
+    private int raftChange, raftChangeCounter, sinkSpeed, maxSink = 520; // make this 0 and have win clause change it to 520  
     private int spriteX = 350, spriteY = 455;
-    public static int moveSpeed = 10;
+    public static int moveSpeed;
     private final int spriteWidth = 50, spriteHeight = 50;
     private int counter = 0;
     private int heliX = 1000, heliY = 50, ropeLength = 1, extendedRopeLength = 300;
@@ -515,6 +516,7 @@ class GamePlayState extends GameState {
         random = new Random();
         counter = 100;
         moveSpeed = 10;
+        sinkSpeed = 25;
     }
 
     // Method to update variable to keep track of how many frames it has been since character has eaten
@@ -901,7 +903,7 @@ class GamePlayState extends GameState {
             spriteX = Math.min(spriteX+moveSpeed, 775-spriteWidth);
 
         // Randomly generate a meatball (1/25 chance every frame, 1 frame every 16 ms, avg 2.5 meatballs ever second)
-        if (random.nextInt(15) == 0 && !hasEnded) { 
+        if (random.nextInt(10) == 0 && !hasEnded) { 
             int x = random.nextInt(740);
             meatballs.add(new Meatball(x, (30+random.nextInt(10)), random.nextInt(100)));
         }
